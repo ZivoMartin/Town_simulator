@@ -10,7 +10,7 @@ struct Xy{
     int y;
 };
 
-union uninon_building{
+union union_building{
     Shop *shop;
     House *house;
     Field *field;
@@ -19,12 +19,13 @@ union uninon_building{
 enum type_building{
     SHOP,
     HOUSE,
-    FIELD
+    FIELD,
+    EMPTY
 };
 
 struct build_tab_case{
     type_building type;
-    uninon_building building;
+    union_building building;
 };
 
 

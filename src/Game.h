@@ -6,6 +6,8 @@
 #include <iostream>
 #include <QPixmap>
 #include <QColor>
+#include <QString>
+#include <QTimer>
 #include "image/GraphicsPixmapItem.h"
 #include "view/GraphicsView.h"
 #include "buildings/field.h"
@@ -15,7 +17,13 @@
 #define MAP_WIDTH 10000
 #define MAP_HEIGHT 10000
 #define CASE_SIZE 20
-
+#define FIELD_WIDTH 100
+#define FIELD_HEIGHT 100
+#define SHOP_WIDTH 100
+#define SHOP_HEIGHT 100
+#define HOUSE_WIDTH 100
+#define HOUSE_HEIGHT 100
+#define FRAME_SPEED 20
 
 
 class Game : public QMainWindow{
@@ -23,21 +31,43 @@ class Game : public QMainWindow{
 public: 
     Game(GraphicsView *view);
     ~Game();
+    void play();
     int get_iter();
 
     void load_images();
-
+    void setup_scene();
     QPixmap *get_img(std::string img);
     GraphicsView *get_view();
-    void setup_scene();
+    Xy *get_img_size(std::string img);
+    Xy coord_to_tab(Xy *entry);
+    Xy tab_to_coord(Xy *entry);
+    void create_new_building(std::string type, Xy pos);
+    template <typename T> void new_building(T *new_building, void (Game::*f)(Xy, T*));
+    template <typename T> void free_vec(std::vector<T> vec);
+    void set_case_field(Xy pos, Field *field);
+    void set_case_shop(Xy pos, Shop *shop);
+    void set_case_house(Xy pos, House *house);
+    void set_case_empty(Xy pos);
+    build_tab_case *get_map_tab_case(Xy pos);
+    int convert_one_dim(Xy *pos);
+    bool is_empty_place(Xy *pos, Xy *size);
 
 private:
     GraphicsView *view;
     unsigned int iter = 0;
+    
     std::map<std::string, QPixmap*> images_map;
-    std::vector<GraphicsPixmapItem*> field_vec;
-    std::vector<std::vector<build_tab_case>> map_tab;
+    std::map<std::string, Xy> dim_img_map;
+    std::map<int, build_tab_case> map_tab;
+
+    std::vector<Field*> field_vec;
+    std::vector<House*> house_vec;
+    std::vector<Shop*> shop_vec;
+    
+    
     QColor *background_color;
+    Xy map_case_dim;
+    
 };
 
 int random(int min, int max);
