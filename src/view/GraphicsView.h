@@ -4,6 +4,9 @@
 #include <QGraphicsScene>
 #include <iostream>
 #include <QColor>
+#include <QMouseEvent>
+#include <QPointF>
+
 #include "../struct.h"
 class Game;
 
@@ -17,7 +20,10 @@ public:
     void set_bg_color(QColor *color);
     void zoom(double factor);
     void set_size(Xy s);
-    
+    void mousePressEvent(QMouseEvent* event) override; 
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    Xy convert(QPointF coord_clic);   
     
 private:
     QGraphicsScene *scene;

@@ -32,7 +32,9 @@ public:
     Game(GraphicsView *view);
     ~Game();
     void play();
+    void init_game();
     int get_iter();
+    void screen_clicked(Xy coord_click);
 
     void load_images();
     void setup_scene();
@@ -51,6 +53,8 @@ public:
     build_tab_case *get_map_tab_case(Xy pos);
     int convert_one_dim(Xy *pos);
     bool is_empty_place(Xy *pos, Xy *size);
+    bool is_dragging();
+    void click_release();
 
 private:
     GraphicsView *view;
@@ -64,6 +68,7 @@ private:
     std::vector<House*> house_vec;
     std::vector<Shop*> shop_vec;
     
+    drag dragging;
     
     QColor *background_color;
     Xy map_case_dim;

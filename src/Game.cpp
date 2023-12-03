@@ -6,9 +6,7 @@ Game::Game(GraphicsView *view): QMainWindow(){
     load_images();
     setup_scene();
     map_case_dim = {MAP_WIDTH/CASE_SIZE, MAP_HEIGHT/CASE_SIZE};
-    create_new_building("field", {2, 2});
-    create_new_building("shop", {6, 2});
-    create_new_building("house", {8, 2});
+    init_game();
     play();
 }
 
@@ -23,10 +21,43 @@ Game::~Game(){
     delete view;
 }
 
+void Game::init_game(){
+    create_new_building("field", {21, 32});
+    create_new_building("shop", {26, 23});
+    create_new_building("house", {51, 30});
+}
+
 void Game::play(){
     QTimer::singleShot(FRAME_SPEED, this, [=](){
         iter += 1;
     });
+}
+
+
+void Game::screen_clicked(Xy coord_click){
+    build_tab_case *clicked_case = get_map_tab_case(coord_to_tab(&coord_click));
+    if(clicked_case == nullptr){
+        
+    }else{
+        dragging = {true, *clicked_case};
+        if(clicked_case->type == FIELD){
+            
+        }else if(clicked_case->type == HOUSE){
+            
+        }else{
+            
+        }
+    }
+}
+
+void Game::click_release(){
+    dragging.dragging = false;
+}
+
+void Game::mouse_move(Xy pos){
+    if(is_dragging()){
+        dragging->item()
+    }
 }
 
 template <typename T>
@@ -39,7 +70,9 @@ void Game::free_vec(std::vector<T> vec){
 int Game::get_iter(){
     return iter;
 }
-
+bool Game::is_dragging(){
+    return dragging.dragging;
+}
 void Game::load_images(){
     std::string t[] = {"field", "house", "shop"};
 

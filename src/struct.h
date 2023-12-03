@@ -28,5 +28,10 @@ struct build_tab_case{
     union_building building;
 };
 
+struct drag{
+    bool dragging;
+    build_tab_case item;
+};
+
 
 #endif
