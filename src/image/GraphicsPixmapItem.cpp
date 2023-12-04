@@ -13,8 +13,8 @@ GraphicsPixmapItem::~GraphicsPixmapItem(){
 
 void GraphicsPixmapItem::set_pos_img(Xy pos){
     Xy s = get_img_size();
-    this->position = {pos.x+s.x/2, pos.y+s.y/2};
-    this->setPos(pos.x, pos.y);
+    this->position = pos;
+    this->setPos(pos.x-s.x/2, pos.y-s.x/2);
 }
 
 Xy *GraphicsPixmapItem::get_pos(){

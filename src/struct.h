@@ -4,6 +4,7 @@
 class Field;
 class House;
 class Shop;
+class InfoZone;
 
 struct Xy{
     int x;

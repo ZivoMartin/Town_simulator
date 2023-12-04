@@ -32,8 +32,13 @@ Xy *Building::get_origin_pos(){
 
 void Building::set_origin_pos(Xy new_pos){
     origin_pos = new_pos;
+    set_pos_img(new_pos);
 }
 
 Xy Building::get_size(){
     return get_img_size();
+}
+
+int Building::get_efficiency(){
+    return value_per_worker*nb_worker;
 }
