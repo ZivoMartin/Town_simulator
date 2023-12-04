@@ -12,7 +12,7 @@ GraphicsPixmapItem::~GraphicsPixmapItem(){
 }
 
 void GraphicsPixmapItem::set_pos_img(Xy pos){
-    Xy s = get_size();
+    Xy s = get_img_size();
     this->position = {pos.x+s.x/2, pos.y+s.y/2};
     this->setPos(pos.x, pos.y);
 }
@@ -21,6 +21,6 @@ Xy *GraphicsPixmapItem::get_pos(){
     return &position;
 }
 
-Xy GraphicsPixmapItem::get_size(){
+Xy GraphicsPixmapItem::get_img_size(){
     return {static_cast<int>(image->size().width()), static_cast<int>(image->size().width())};
 }

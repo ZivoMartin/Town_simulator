@@ -22,9 +22,9 @@ Game::~Game(){
 }
 
 void Game::init_game(){
-    create_new_building("field", {21, 32});
-    create_new_building("shop", {26, 23});
-    create_new_building("house", {51, 30});
+    create_new_building("field", {21*CASE_SIZE, 32*CASE_SIZE});
+    create_new_building("shop", {26*CASE_SIZE, 23*CASE_SIZE});
+    create_new_building("house", {51*CASE_SIZE, 30*CASE_SIZE});
 }
 
 void Game::play(){
@@ -50,14 +50,60 @@ void Game::screen_clicked(Xy coord_click){
     }
 }
 
-void Game::click_release(){
-    dragging.dragging = false;
+void Game::click_release(Xy stop_pos){
+    if(is_dragging()){
+        dragging.dragging = false;
+        Xy size = apply_get_method(&dragging.item, &Building::get_size);
+        Xy *origin_pos = apply_get_method(&dragging.item, &Building::get_origin_pos);
+        if(is_empty_place(&stop_pos, &size)){
+            erase_zone(origin_pos, &size);
+            apply_method(&dragging.item, &Building::set_origin_pos, stop_pos);
+            if(dragging.item.type == FIELD){
+                new_building(dragging.item.building.field, &Game::set_case_field);
+            }else if(dragging.item.type == HOUSE){
+                new_building(dragging.item.building.house, &Game::set_case_house);
+            }else{
+                new_building(dragging.item.building.shop, &Game::set_case_shop);
+            }
+        }else{
+            apply_method(&dragging.item, &Building::drag, *origin_pos);
+        }
+    }    
 }
 
 void Game::mouse_move(Xy pos){
     if(is_dragging()){
-        dragging->item()
+        apply_method(&dragging.item, &Building::drag, pos);
     }
+}
+
+template <typename T, typename G>
+G Game::apply_method(build_tab_case *building, G (Building::*f)(T), T arg){
+    switch (building->type){
+        case FIELD:
+            return (building->building.field->*f)(arg);
+        case SHOP:
+            return (building->building.shop->*f)(arg);
+        case HOUSE:
+            return (building->building.house->*f)(arg);     
+        case EMPTY:
+            exit(EXIT_FAILURE); 
+    }
+}
+
+template <typename G>
+G Game::apply_get_method(build_tab_case *building, G (Building::*f)()){
+    switch (building->type){
+        case FIELD:
+            return (building->building.field->*f)();
+        case SHOP:
+            return (building->building.shop->*f)();
+        case HOUSE:
+            return (building->building.house->*f)();     
+        case EMPTY:
+            exit(EXIT_FAILURE);   
+    }
+    exit(EXIT_FAILURE);
 }
 
 template <typename T>
@@ -109,15 +155,15 @@ Xy *Game::get_img_size(std::string img){
 void Game::create_new_building(std::string type, Xy pos){
     if (is_empty_place(&pos, get_img_size(type))){
         if (type == "shop") {
-            Shop *new_building = new Shop(this, tab_to_coord(&pos));
+            Shop *new_building = new Shop(this, pos);
             shop_vec.push_back(new_building);
             this->new_building(new_building, &Game::set_case_shop);
         } else if (type == "house") {
-            House *new_building = new House(this, tab_to_coord(&pos));
+            House *new_building = new House(this, pos);
             house_vec.push_back(new_building);
             this->new_building(new_building, &Game::set_case_house);
         } else if (type == "field") {
-            Field *new_building = new Field(this, tab_to_coord(&pos));
+            Field *new_building = new Field(this, pos);
             field_vec.push_back(new_building);
             this->new_building(new_building, &Game::set_case_field);
         }
@@ -140,12 +186,28 @@ void Game::new_building(T *new_building, void (Game::*f)(Xy, T*)) {
     }
 }
 
-bool Game::is_empty_place(Xy *pos, Xy *size){
+void Game::erase_zone(Xy *pos_without_convert, Xy *s) {
+    Xy pos = coord_to_tab(pos_without_convert);
+    int s_x = (s->x/2)/CASE_SIZE + 1;
+    int s_y = (s->y/2)/CASE_SIZE + 1;
+    for (int i = 0; i < s_x; i++) {
+        for (int j = 0; j < s_y; j++) {
+            printf("%d %d\n", pos.x+i, pos.y+j);
+            set_case_empty({pos.x+i, pos.y+j});
+            set_case_empty({pos.x+i, pos.y-j});
+            set_case_empty({pos.x-i, pos.y+j});
+            set_case_empty({pos.x-i, pos.y-j});
+        }
+    }
+}
+
+bool Game::is_empty_place(Xy *pos_without_convert, Xy *size){
+    Xy pos = coord_to_tab(pos_without_convert);
     int s_x = (size->x/2)/CASE_SIZE + 1;
     int s_y = (size->y/2)/CASE_SIZE + 1;
     for (int i = 0; i < s_x; i++) {
         for (int j = 0; j < s_y; j++) {
-            if(get_map_tab_case({pos->x+i, pos->y+j}) != nullptr || get_map_tab_case({pos->x+i, pos->y-j}) != nullptr || get_map_tab_case({pos->x-i, pos->y+j}) != nullptr || get_map_tab_case({pos->x-i, pos->y-j}) != nullptr){
+            if(get_map_tab_case({pos.x+i, pos.y+j}) != nullptr || get_map_tab_case({pos.x+i, pos.y-j}) != nullptr || get_map_tab_case({pos.x-i, pos.y+j}) != nullptr || get_map_tab_case({pos.x-i, pos.y-j}) != nullptr){
                 return false;
             }
         }

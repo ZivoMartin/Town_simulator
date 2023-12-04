@@ -14,7 +14,7 @@ public:
     ~GraphicsPixmapItem();
     Xy *get_pos();
     void set_pos_img(Xy coord);
-    Xy get_size();
+    Xy get_img_size();
 
 private:
     QGraphicsScene *scene;

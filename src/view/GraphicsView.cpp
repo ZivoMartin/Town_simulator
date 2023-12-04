@@ -40,13 +40,11 @@ void GraphicsView::mousePressEvent(QMouseEvent* event){
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent* event){
-    if(game->is_dragging()){
-        game->mouse_move();
-    }
+    game->mouse_move(convert(mapToScene(event->pos())));
 }
 
-void GraphicsView::mouseReleaseEvent(){
-    game->click_release();
+void GraphicsView::mouseReleaseEvent(QMouseEvent *event){
+    game->click_release(convert(mapToScene(event->pos())));
 }
 
 Xy GraphicsView::convert(QPointF coord_clic){

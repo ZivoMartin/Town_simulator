@@ -46,6 +46,7 @@ public:
     void create_new_building(std::string type, Xy pos);
     template <typename T> void new_building(T *new_building, void (Game::*f)(Xy, T*));
     template <typename T> void free_vec(std::vector<T> vec);
+    void erase_zone(Xy *pos, Xy *s);
     void set_case_field(Xy pos, Field *field);
     void set_case_shop(Xy pos, Shop *shop);
     void set_case_house(Xy pos, House *house);
@@ -54,7 +55,11 @@ public:
     int convert_one_dim(Xy *pos);
     bool is_empty_place(Xy *pos, Xy *size);
     bool is_dragging();
-    void click_release();
+    void click_release(Xy stop_pos);
+    void mouse_move(Xy pos);
+   template <typename T, typename G> G apply_method(build_tab_case *building, G (Building::*f)(T), T arg);
+   template <typename G> G apply_get_method(build_tab_case *building, G (Building::*f)());
+
 
 private:
     GraphicsView *view;

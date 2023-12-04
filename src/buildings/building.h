@@ -13,10 +13,16 @@ public:
 
     int get_level();
     int get_nb_worker();
+    Xy *get_origin_pos();
+    void drag(Xy new_pos);
+    Xy get_size();
+    void set_origin_pos(Xy new_pos);
+
 
 protected:
     int nb_worker = 0;
     int lvl = 0;
+    Xy origin_pos;
     
 };
 
