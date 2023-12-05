@@ -16,6 +16,9 @@
 #include "buildings/shop.h"
 #include "buildings/house.h"
 #include "info_zone/info_zone.h"
+#include "button/button.h"
+#include "settings_building/settings.h"
+
 
 #define MAP_WIDTH 10000
 #define MAP_HEIGHT 10000
@@ -70,6 +73,8 @@ public:
     void mouse_move(Xy pos);
     void build_info_bubble();
     void update_info();
+    Xy *get_size_setting();
+    QColor get_color(std::string color);
 
 private:
     GraphicsView *view;
@@ -87,9 +92,9 @@ private:
     
     drag dragging;
     QColor *background_color;
-    Xy info_bubble_dims = {130, 40};
+    Xy info_bubble_dims = {180, 70};
     Xy map_case_dim = {MAP_WIDTH/CASE_SIZE, MAP_HEIGHT/CASE_SIZE};
-
+    Xy size_settings = {400, 200};
 };
 
 int random(int min, int max);

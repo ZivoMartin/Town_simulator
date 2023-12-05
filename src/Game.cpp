@@ -9,6 +9,7 @@ Game::Game(GraphicsView *view): QMainWindow(){
     build_info_bubble();
     setup_scene();
     init_game();
+    Setting *test = new Setting(this, {30, 30});
     play();
 }
 
@@ -19,13 +20,13 @@ Game::~Game(){
     free_map(images_map);
     free_map(top_info);
     delete background_color;
+    delete view;
 }
 
 
 template <typename K, typename V>
 void Game::free_map(std::map<K, V> map){
     for(auto el: map){
-        std::cout << el.first << std::endl;
         delete map[el.first];
     }
 }
@@ -43,14 +44,15 @@ void Game::play(){
             update_info();    
         }
         view->update();
+        play();
     });
 }
 
 void Game::load_colors(){
-    QColor top_info(255, 255, 153);
-    color_map["top_info"] = top_info;
-    QColor top_ratio(255, 150, 153);
-    color_map["top_ratio"] = top_ratio;
+    color_map["top_info"] = QColor(255, 255, 153);
+    color_map["top_ratio"] = QColor(255, 150, 153);
+    color_map["settings"] = QColor(220, 220, 220);
+    color_map["close_button"] = QColor(255, 0, 0);
 }
 
 void Game::build_info_bubble(){
@@ -60,7 +62,7 @@ void Game::build_info_bubble(){
     top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], 0);
     top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], BASE_CITIZEN);
     top_info["nb_gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], 0);
-    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], -BASE_CITIZEN);
+    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], -BASE_CITIZEN/10);
     top_info["nb_citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], 0);
 }
 
@@ -71,18 +73,28 @@ void Game::screen_clicked(Xy coord_click){
     }else{
         dragging = {true, *clicked_case};
         if(clicked_case->type == FIELD){
-            
+            clicked_case->building.field->clicked();
         }else if(clicked_case->type == HOUSE){
-            
+            clicked_case->building.house->clicked();
         }else{
-            
+            clicked_case->building.shop->clicked();
         }
     }
 }
 
+QColor Game::get_color(std::string color){
+    return color_map[color];
+}
+
 void Game::update_info(){
     top_info["nb_gold"]->set_value(top_info["nb_gold"]->get_value()+top_info["nb_gold_ratio"]->get_value());
-    top_info["nb_food"]->set_value(top_info["nb_food"]->get_value()+top_info["nb_food_ratio"]->get_value());
+    float new_food = top_info["nb_food"]->get_value()+top_info["nb_food_ratio"]->get_value();
+    if(new_food > 0){
+        top_info["nb_food"]->set_value(new_food);    
+    }else{
+        top_info["nb_citizen"]->set_value(top_info["nb_food"]->get_value()-1);
+    }
+    
 }
 
 void Game::click_release(Xy stop_pos){
@@ -304,6 +316,10 @@ build_tab_case *Game::get_map_tab_case(Xy pos){
     }
     return nullptr;
 }    
+
+Xy *Game::get_size_setting(){
+    return &size_settings;
+}
 
 
 Xy Game::coord_to_tab(Xy *entry){

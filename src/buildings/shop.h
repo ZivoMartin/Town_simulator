@@ -11,7 +11,6 @@ public:
     ~Shop();
 
 private:
-    Game *game;
 
 };
 

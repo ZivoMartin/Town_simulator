@@ -12,7 +12,6 @@ public:
     ~Field();
 
 private:
-    Game *game;
 };
 
 #endif

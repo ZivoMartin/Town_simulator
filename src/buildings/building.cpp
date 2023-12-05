@@ -1,7 +1,11 @@
 #include "building.h"
+#include "../Game.h"
+#include "../settings_building/settings.h"
 
-Building::Building(QPixmap *image, QGraphicsScene *scene, Xy coord) : GraphicsPixmapItem(image, scene, coord){
+Building::Building(QPixmap *image, Game *game, Xy coord) : GraphicsPixmapItem(image, game->get_view()->get_scene(), coord){
     origin_pos = coord;
+    game = game;
+    setting = new Setting(game, coord);
 }
 
 Building::~Building(){}
@@ -41,4 +45,8 @@ Xy Building::get_size(){
 
 int Building::get_efficiency(){
     return value_per_worker*nb_worker;
+}
+
+void Building::clicked(){
+    setting->open();
 }

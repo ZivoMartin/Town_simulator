@@ -8,7 +8,6 @@ GraphicsView::GraphicsView() : QGraphicsView(){
 }
 
 GraphicsView::~GraphicsView(){
-    delete scene;
 }
 
 QGraphicsScene * GraphicsView::get_scene(){

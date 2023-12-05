@@ -3,10 +3,13 @@
 
 #include "../image/GraphicsPixmapItem.h"
 
+class Game;
+class Setting;
+
 class Building : public GraphicsPixmapItem{
 
 public:
-    Building(QPixmap *image, QGraphicsScene *scene, Xy coord);
+    Building(QPixmap *image, Game *game, Xy coord);
     ~Building();
     void set_worker(int x);
     void level_up();
@@ -17,12 +20,15 @@ public:
     Xy get_size();
     void set_origin_pos(Xy new_pos);
     virtual int get_efficiency();
+    virtual void clicked();
 
 protected:
+    Game *game;
     int nb_worker = 0;
     int value_per_worker = 0;
     int lvl = 0;
     Xy origin_pos;
+    Setting *setting;
     
 };
 

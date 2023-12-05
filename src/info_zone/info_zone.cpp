@@ -10,14 +10,13 @@ InfoZone::InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, float
     this->brush = new QBrush(color);
     this->setBrush(*brush);
     text_item->setPos(pos.x+10, pos.y + size.y/4.5); 
+    text_item->setDefaultTextColor(QColor(0, 0, 0));
     game->get_view()->get_scene()->addItem(this);
     game->get_view()->get_scene()->addItem(text_item);
     set_value(base_value);
 }
 
 InfoZone::~InfoZone(){
-    game->get_view()->get_scene()->removeItem(this);
-    game->get_view()->get_scene()->removeItem(text_item);
     delete text_item;
     delete brush;
 }
