@@ -1,6 +1,9 @@
 #ifndef safe_struct
 #define safe_struct
 
+#include <QGraphicsEllipseItem>
+#include <QGraphicsRectItem>
+
 class Field;
 class House;
 class Shop;
@@ -34,5 +37,19 @@ struct drag{
     build_tab_case item;
 };
 
+enum form_type{
+    RECT,
+    CIRCLE
+};
+
+union form{
+    QGraphicsEllipseItem *circle;
+    QGraphicsRectItem *rect;
+};
+
+struct text_info_bg{
+    form_type type;
+    form bg;
+};
 
 #endif

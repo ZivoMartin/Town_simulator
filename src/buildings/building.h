@@ -16,11 +16,13 @@ public:
     int get_level();
     int get_nb_worker();
     Xy *get_origin_pos();
+    Xy *get_current_pos();
     void drag(Xy new_pos);
     Xy get_size();
     void set_origin_pos(Xy new_pos);
     virtual int get_efficiency();
     virtual void clicked();
+    void close_setting();
 
 protected:
     Game *game;
@@ -29,7 +31,7 @@ protected:
     int lvl = 0;
     Xy origin_pos;
     Setting *setting;
-    
+    build_tab_case *setting_union;
 };
 
 #endif

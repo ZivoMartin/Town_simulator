@@ -16,7 +16,6 @@
 #include "buildings/shop.h"
 #include "buildings/house.h"
 #include "info_zone/info_zone.h"
-#include "button/button.h"
 #include "settings_building/settings.h"
 
 
@@ -33,6 +32,7 @@
 #define BASE_CITIZEN 10
 #define BASE_FOOD 100
 #define BASE_GOLD 100
+
 
 class Game : public QMainWindow{
 
@@ -75,6 +75,11 @@ public:
     void update_info();
     Xy *get_size_setting();
     QColor get_color(std::string color);
+    void set_current_setting(build_tab_case *new_setting);
+    void close_setting();
+    void erase_button(PushButton *button);
+    void add_button(PushButton *new_button);
+    bool its_a_button_click(Xy *pos);
 
 private:
     GraphicsView *view;
@@ -89,12 +94,15 @@ private:
     std::vector<Field*> field_vec;
     std::vector<House*> house_vec;
     std::vector<Shop*> shop_vec;
+    std::vector<PushButton*> button_vec;
     
     drag dragging;
     QColor *background_color;
     Xy info_bubble_dims = {180, 70};
     Xy map_case_dim = {MAP_WIDTH/CASE_SIZE, MAP_HEIGHT/CASE_SIZE};
     Xy size_settings = {400, 200};
+
+    build_tab_case *current_open_setting = nullptr;
 };
 
 int random(int min, int max);

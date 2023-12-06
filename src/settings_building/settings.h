@@ -4,30 +4,35 @@
 #include <iostream>
 #include <QGraphicsRectItem>
 #include <QBrush>
-#include <QObject>
+#include <QApplication>
+
 #include "../buildings/field.h"
 #include "../buildings/house.h"
 #include "../buildings/shop.h"
 #include "../struct.h"
 #include "../button/button.h"
 
-class Game;
 
-class Setting: public QGraphicsRectItem, public QObject{
-    
+class Setting: public QGraphicsRectItem{
+
 public:    
     Setting(Game *game, Xy pos);
     ~Setting();
     void open();
+    void close();
+    void set_pos(Xy pos);
+    void add_button(PushButton *button);
+    void erase_button(PushButton *button);
 
-public slots:
-     void close();
 
 private:
     PushButton *close_button;
     Xy size;
     Game *game;
     QBrush *brush;
+    QGraphicsScene *scene;
+    Xy origin;
+    std::vector<PushButton*> button_vec;
 };
 
 #endif

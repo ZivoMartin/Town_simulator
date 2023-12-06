@@ -9,7 +9,6 @@ Game::Game(GraphicsView *view): QMainWindow(){
     build_info_bubble();
     setup_scene();
     init_game();
-    Setting *test = new Setting(this, {30, 30});
     play();
 }
 
@@ -34,7 +33,7 @@ void Game::free_map(std::map<K, V> map){
 void Game::init_game(){
     create_new_building("field", {34*CASE_SIZE, 28*CASE_SIZE});
     create_new_building("shop", {36*CASE_SIZE, 22*CASE_SIZE});
-    create_new_building("house", {23*CASE_SIZE, 36*CASE_SIZE});
+    create_new_building("house", {30*CASE_SIZE, 22*CASE_SIZE});
 }
 
 void Game::play(){
@@ -53,33 +52,36 @@ void Game::load_colors(){
     color_map["top_ratio"] = QColor(255, 150, 153);
     color_map["settings"] = QColor(220, 220, 220);
     color_map["close_button"] = QColor(255, 0, 0);
+    color_map["building_add_worker_button"] = QColor(50, 200, 0);
+    color_map["building_less_worker_button"] = QColor(255, 200, 100);
 }
 
 void Game::build_info_bubble(){
-    top_info["nb_gold"] = new InfoZone(this, {30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Golds: ", color_map["top_info"], BASE_GOLD);
-    top_info["nb_food"] = new InfoZone(this, {info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food: ", color_map["top_info"], BASE_FOOD);
-    top_info["nb_citizen"] = new InfoZone(this, {30+2*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizens: ", color_map["top_info"], BASE_CITIZEN);
-    top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], 0);
-    top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], BASE_CITIZEN);
-    top_info["nb_gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], 0);
-    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], -BASE_CITIZEN/10);
-    top_info["nb_citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], 0);
+    top_info["nb_gold"] = new InfoZone(this, {30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Golds: ", color_map["top_info"], BASE_GOLD, CIRCLE);
+    top_info["nb_food"] = new InfoZone(this, {info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food: ", color_map["top_info"], BASE_FOOD, CIRCLE);
+    top_info["nb_citizen"] = new InfoZone(this, {30+2*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizens: ", color_map["top_info"], BASE_CITIZEN, CIRCLE);
+    top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], 0, CIRCLE);
+    top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], BASE_CITIZEN, CIRCLE);
+    top_info["nb_gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], 0, CIRCLE);
+    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], -BASE_CITIZEN/10, CIRCLE);
+    top_info["nb_citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], 0, CIRCLE);
 }
 
 void Game::screen_clicked(Xy coord_click){
-    build_tab_case *clicked_case = get_map_tab_case(coord_to_tab(&coord_click));
-    if(clicked_case == nullptr){
+    if(its_a_button_click(&coord_click)){
 
-    }else{
-        dragging = {true, *clicked_case};
-        if(clicked_case->type == FIELD){
-            clicked_case->building.field->clicked();
-        }else if(clicked_case->type == HOUSE){
-            clicked_case->building.house->clicked();
+    }else if(current_open_setting == nullptr){
+        build_tab_case *clicked_case = get_map_tab_case(coord_to_tab(&coord_click));
+        if(clicked_case == nullptr){
+
         }else{
-            clicked_case->building.shop->clicked();
-        }
+            dragging = {true, *clicked_case};
+        }       
     }
+}
+
+void Game::set_current_setting(build_tab_case *new_setting){
+    current_open_setting = new_setting;
 }
 
 QColor Game::get_color(std::string color){
@@ -99,23 +101,34 @@ void Game::update_info(){
 
 void Game::click_release(Xy stop_pos){
     if(is_dragging()){
-        Xy size = apply_get_method(&dragging.item, &Building::get_size);
         Xy *origin_pos = apply_get_method(&dragging.item, &Building::get_origin_pos);
-        Xy tab_new_pos = coord_to_tab(&stop_pos);
-        correct_pos(&tab_new_pos, &size);
-        stop_pos = tab_to_coord(&tab_new_pos);
-        if(is_empty_place(&stop_pos, &size)){
-            erase_zone(origin_pos, &size);
-            apply_method(&dragging.item, &Building::set_origin_pos, stop_pos);
-            if(dragging.item.type == FIELD){
-                new_building(dragging.item.building.field, &Game::set_case_field);
-            }else if(dragging.item.type == HOUSE){
-                new_building(dragging.item.building.house, &Game::set_case_house);
+        Xy *current_pos = apply_get_method(&dragging.item, &Building::get_current_pos);
+        if(origin_pos->x != current_pos->x || origin_pos->y != current_pos->y){
+            Xy size = apply_get_method(&dragging.item, &Building::get_size);
+            Xy tab_new_pos = coord_to_tab(&stop_pos);
+            correct_pos(&tab_new_pos, &size);
+            stop_pos = tab_to_coord(&tab_new_pos);
+            if(is_empty_place(&stop_pos, &size)){
+                erase_zone(origin_pos, &size);
+                apply_method(&dragging.item, &Building::set_origin_pos, stop_pos);
+                if(dragging.item.type == FIELD){
+                    new_building(dragging.item.building.field, &Game::set_case_field);
+                }else if(dragging.item.type == HOUSE){
+                    new_building(dragging.item.building.house, &Game::set_case_house);
+                }else{
+                    new_building(dragging.item.building.shop, &Game::set_case_shop);
+                }
             }else{
-                new_building(dragging.item.building.shop, &Game::set_case_shop);
+                apply_method(&dragging.item, &Building::drag, *origin_pos);
             }
         }else{
-            apply_method(&dragging.item, &Building::drag, *origin_pos);
+            if(dragging.item.type == FIELD){
+                dragging.item.building.field->clicked();
+            }else if(dragging.item.type == HOUSE){
+                dragging.item.building.house->clicked();
+            }else{
+                dragging.item.building.shop->clicked();
+            }
         }
         dragging.dragging = false;
     }    
@@ -358,4 +371,31 @@ int random(int min, int max){
 
 int get_dist(Xy *coord1, Xy *coord2){
     return (coord1->x-coord2->x)*(coord1->x-coord2->x) + (coord1->y-coord2->y)*(coord1->y-coord2->y);
+}
+
+void Game::close_setting(){
+    apply_get_method(current_open_setting, &Building::close_setting);
+}
+
+void Game::add_button(PushButton *new_button){
+    button_vec.push_back(new_button);
+}
+
+void Game::erase_button(PushButton *button){
+    for(unsigned int i=0; i<button_vec.size(); i++){
+        if(button_vec[i] == button){
+            button_vec.erase(button_vec.begin()+i);
+            break;
+        }
+    }
+}
+
+bool Game::its_a_button_click(Xy *pos){
+    for(unsigned int i=0; i<button_vec.size(); i++){
+        if(button_vec[i]->is_it(pos)){
+            button_vec[i]->is_clicked();
+            return true;
+        }
+    }
+    return false;
 }

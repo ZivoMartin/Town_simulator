@@ -4,11 +4,15 @@
 
 Building::Building(QPixmap *image, Game *game, Xy coord) : GraphicsPixmapItem(image, game->get_view()->get_scene(), coord){
     origin_pos = coord;
-    game = game;
+    this->game = game;
     setting = new Setting(game, coord);
 }
 
-Building::~Building(){}
+Building::~Building(){
+    if(setting_union != nullptr){
+        delete setting_union;
+    }
+}
 
 void Building::set_worker(int x){
     nb_worker += x;
@@ -37,6 +41,7 @@ Xy *Building::get_origin_pos(){
 void Building::set_origin_pos(Xy new_pos){
     origin_pos = new_pos;
     set_pos_img(new_pos);
+    setting->set_pos(new_pos);
 }
 
 Xy Building::get_size(){
@@ -49,4 +54,13 @@ int Building::get_efficiency(){
 
 void Building::clicked(){
     setting->open();
+    game->set_current_setting(setting_union);
+}
+
+Xy *Building::get_current_pos(){
+    return get_pos();
+}
+
+void Building::close_setting(){
+    setting->close();
 }
