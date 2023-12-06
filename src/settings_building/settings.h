@@ -23,7 +23,8 @@ public:
     void set_pos(Xy pos);
     void add_button(PushButton *button);
     void erase_button(PushButton *button);
-
+    void add_info_zone(InfoZone *new_text);
+    void erase_info_zone(InfoZone *new_text);
 
 private:
     PushButton *close_button;
@@ -32,7 +33,8 @@ private:
     QBrush *brush;
     QGraphicsScene *scene;
     Xy origin;
-    std::vector<PushButton*> button_vec;
+    std::map<std::string, PushButton*> button_map;
+    std::vector<std::string, InfoZone*> infozone_map;
 };
 
 #endif

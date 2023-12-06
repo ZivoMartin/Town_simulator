@@ -6,7 +6,7 @@ Setting::Setting(Game *game, Xy pos) : QGraphicsRectItem(pos.x, pos.y, game->get
     this->origin = pos;
     this->scene = game->get_view()->get_scene(); 
     this->size = {game->get_size_setting()->x, game->get_size_setting()->y};
-    this->close_button = new PushButton(game, "X", pos, game->get_color("close_button"), {30, 30}, &Game::close_setting);    
+    this->close_button = new PushButton(game, "X", pos, game->get_color("close_button"), {30, 30}, &Game::close_setting, "closing");    
     this->brush = new QBrush(game->get_color("settings"));
     setBrush(*brush);
 }
@@ -39,14 +39,9 @@ void Setting::set_pos(Xy pos){
 }
 
 void Setting::add_button(PushButton *new_button){
-    button_vec.push_back(new_button);
+    button_map[new_button->get_name()] = new_button;
 }
 
-void Setting::erase_button(PushButton *button){
-    for(unsigned int i=0; i<button_vec.size(); i++){
-        if(button_vec[i] == button){
-            button_vec.erase(button_vec.begin()+i);
-            break;
-        }
-    }
+void Setting::erase_button(std::string name){
+    button_map.erase()
 }

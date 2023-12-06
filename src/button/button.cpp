@@ -2,7 +2,7 @@
 #include "../Game.h"
 
 
-PushButton::PushButton(Game *game, QString txt, Xy pos, QColor color, Xy size, void (Game::*f)()) : QGraphicsRectItem(pos.x, pos.y, size.x, size.y){
+PushButton::PushButton(Game *game, QString txt, Xy pos, QColor color, Xy size, void (Game::*f)(), std::string name) : QGraphicsRectItem(pos.x, pos.y, size.x, size.y){
     this->game = game;
     this->scene = game->get_view()->get_scene();
     this->size = size;
@@ -10,12 +10,11 @@ PushButton::PushButton(Game *game, QString txt, Xy pos, QColor color, Xy size, v
     this->pos = pos;
     brush = new QBrush(color);
     this->setBrush(*brush);
-
     base_text = txt;
     this->text_item = new QGraphicsTextItem(txt);
     text_item->setPos(pos.x+3, pos.y); 
     text_item->setDefaultTextColor(QColor(0, 0, 0));
-
+    this->name = name;
     this->click = f;
 }
 

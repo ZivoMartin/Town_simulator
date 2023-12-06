@@ -1,7 +1,7 @@
 #include "info_zone.h"
 #include "../Game.h"
 
-InfoZone::InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, float base_value, form_type type_bg) : QGraphicsTextItem(txt){
+InfoZone::InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_type type_bg) : QGraphicsTextItem(txt){
     position = pos;
     size = size;
     scene = game->get_view()->get_scene();
@@ -11,7 +11,6 @@ InfoZone::InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, float
     this->setPos(pos.x+10, pos.y + size.y/4.5); 
     this->setDefaultTextColor(QColor(0, 0, 0));
     scene->addItem(this);
-    set_value(base_value);
 }
 
 InfoZone::~InfoZone(){

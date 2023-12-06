@@ -54,18 +54,30 @@ void Game::load_colors(){
     color_map["close_button"] = QColor(255, 0, 0);
     color_map["building_add_worker_button"] = QColor(50, 200, 0);
     color_map["building_less_worker_button"] = QColor(255, 200, 100);
+    color_map["set_info_color"] = QColor(100, 67, 200);
 }
 
 void Game::build_info_bubble(){
-    top_info["nb_gold"] = new InfoZone(this, {30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Golds: ", color_map["top_info"], BASE_GOLD, CIRCLE);
-    top_info["nb_food"] = new InfoZone(this, {info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food: ", color_map["top_info"], BASE_FOOD, CIRCLE);
-    top_info["nb_citizen"] = new InfoZone(this, {30+2*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizens: ", color_map["top_info"], BASE_CITIZEN, CIRCLE);
-    top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], 0, CIRCLE);
-    top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], BASE_CITIZEN, CIRCLE);
-    top_info["nb_gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], 0, CIRCLE);
-    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], -BASE_CITIZEN/10, CIRCLE);
-    top_info["nb_citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], 0, CIRCLE);
+    top_info["nb_gold"] = new InfoZone(this, {30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Golds: ", color_map["top_info"], CIRCLE);
+    top_info["nb_food"] = new InfoZone(this, {info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food: ", color_map["top_info"], CIRCLE);
+    top_info["nb_citizen"] = new InfoZone(this, {30+2*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizens: ", color_map["top_info"], CIRCLE);
+    top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], CIRCLE);
+    top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], CIRCLE);
+    top_info["nb_gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE);
+    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE);
+    top_info["nb_citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], CIRCLE);
+    
+    top_info["nb_gold"]->set_value(BASE_GOLD);
+    top_info["nb_food"]->set_value(BASE_FOOD);
+    top_info["nb_citizen"]->set_value(BASE_CITIZEN);
+    top_info["nb_worker"]->set_value(0.0);
+    top_info["nb_non_worker"]->set_value(BASE_CITIZEN);
+    top_info["nb_gold_ratio"]->set_value(0.0);
+    top_info["nb_food_ratio"]->set_value(-BASE_CITIZEN/10);
+    top_info["nb_citizen_ratio"]->set_value(0.0);    
 }
+
+
 
 void Game::screen_clicked(Xy coord_click){
     if(its_a_button_click(&coord_click)){

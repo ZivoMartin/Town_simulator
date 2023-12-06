@@ -12,7 +12,7 @@ class Game;
 class InfoZone : public QGraphicsTextItem{
 
 public:
-    InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, float base_value, form_type type_bg);
+    InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_type type_bg);
     ~InfoZone();
     void set_value(float x);
     int get_value();

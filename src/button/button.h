@@ -34,6 +34,7 @@ private:
     QString base_text;
     QGraphicsTextItem *text_item;
     Xy origin_pos;
+    std::string name;
 };
 
 #endif
