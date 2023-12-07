@@ -5,7 +5,8 @@
 Building::Building(QPixmap *image, Game *game, Xy coord) : GraphicsPixmapItem(image, game->get_view()->get_scene(), coord){
     origin_pos = coord;
     this->game = game;
-    setting = new Setting(game, coord);
+    setting = new Setting(game, coord, *game->get_size_setting_building());
+    this->add_img();
 }
 
 Building::~Building(){
@@ -53,14 +54,9 @@ int Building::get_efficiency(){
 }
 
 void Building::clicked(){
-    setting->open();
-    game->set_current_setting(setting_union);
+    game->set_current_setting(setting, setting_union);
 }
 
 Xy *Building::get_current_pos(){
     return get_pos();
-}
-
-void Building::close_setting(){
-    setting->close();
 }

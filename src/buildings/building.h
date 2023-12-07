@@ -3,7 +3,6 @@
 
 #include "../image/GraphicsPixmapItem.h"
 
-class Game;
 class Setting;
 
 class Building : public GraphicsPixmapItem{
@@ -22,7 +21,6 @@ public:
     void set_origin_pos(Xy new_pos);
     virtual int get_efficiency();
     virtual void clicked();
-    void close_setting();
 
 protected:
     Game *game;

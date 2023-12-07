@@ -10,6 +10,8 @@
 #include <QTimer>
 #include <QGraphicsTextItem>
 #include <QColor>
+#include <QGuiApplication>
+#include <QScreen>
 #include "image/GraphicsPixmapItem.h"
 #include "view/GraphicsView.h"
 #include "buildings/field.h"
@@ -17,17 +19,16 @@
 #include "buildings/house.h"
 #include "info_zone/info_zone.h"
 #include "settings_building/settings.h"
+#include "common_functions/common_functions.h"
 
 
-#define MAP_WIDTH 10000
-#define MAP_HEIGHT 10000
-#define CASE_SIZE 20
-#define FIELD_WIDTH 100
-#define FIELD_HEIGHT 100
-#define SHOP_WIDTH 100
-#define SHOP_HEIGHT 100
-#define HOUSE_WIDTH 100
-#define HOUSE_HEIGHT 100
+#define CASE_SIZE 15
+#define FIELD_WIDTH 105
+#define FIELD_HEIGHT 105
+#define SHOP_WIDTH 105
+#define SHOP_HEIGHT 105
+#define HOUSE_WIDTH 105
+#define HOUSE_HEIGHT 105
 #define FRAME_SPEED 20
 #define BASE_CITIZEN 10
 #define BASE_FOOD 100
@@ -54,10 +55,8 @@ public:
     Xy tab_to_coord(Xy *entry);
     void create_new_building(std::string type, Xy pos);
     template <typename T> void new_building(T *new_building, void (Game::*f)(Xy, T*));
-    template <typename T> void free_vec(std::vector<T> vec);
     template <typename T, typename G> G apply_method(build_tab_case *building, G (Building::*f)(T), T arg);
     template <typename G> G apply_get_method(build_tab_case *building, G (Building::*f)());
-    template <typename K, typename V> void free_map(std::map<K, V> map);
     void erase_zone(Xy *pos, Xy *s);
     void set_case_field(Xy pos, Field *field);
     void set_case_shop(Xy pos, Shop *shop);
@@ -73,13 +72,14 @@ public:
     void mouse_move(Xy pos);
     void build_info_bubble();
     void update_info();
-    Xy *get_size_setting();
+    Xy *get_size_setting_building();
     QColor get_color(std::string color);
-    void set_current_setting(build_tab_case *new_setting);
-    void close_setting();
+    void set_current_setting(Setting *setting, build_tab_case *building);
+    void close_current_setting();
     void erase_button(PushButton *button);
     void add_button(PushButton *new_button);
     bool its_a_button_click(Xy *pos);
+    void open_shop();
 
 private:
     GraphicsView *view;
@@ -99,13 +99,12 @@ private:
     drag dragging;
     QColor *background_color;
     Xy info_bubble_dims = {180, 70};
-    Xy map_case_dim = {MAP_WIDTH/CASE_SIZE, MAP_HEIGHT/CASE_SIZE};
-    Xy size_settings = {400, 200};
-
-    build_tab_case *current_open_setting = nullptr;
+    Xy map_case_dim;
+    Xy size_settings_building = {400, 200};
+    current_setting current_open_setting = {nullptr, nullptr};
+    Xy screen_size;
+    Xy shop_setting_size = {800, 300};
+    Setting *shop_menu_setting;
 };
-
-int random(int min, int max);
-int get_dist(Xy *coord1, Xy *coord2);
 
 #endif

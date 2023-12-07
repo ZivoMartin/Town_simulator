@@ -11,7 +11,7 @@ public:
     ~Shop();
 
 private:
-
+    static int max_worker[4];
 };
 
 #endif

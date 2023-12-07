@@ -5,20 +5,21 @@
 #include <QGraphicsTextItem>
 #include <QColor>
 #include "graphic_bg.h"
-#include "../struct.h"
 
 class Game;
 
 class InfoZone : public QGraphicsTextItem{
 
 public:
-    InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_type type_bg);
+    InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_type type_bg, std::string name);
     ~InfoZone();
     void set_value(float x);
     int get_value();
     void add();
     void remove();
     void set_pos(Xy pos);
+    Xy get_pos();
+    std::string get_name();
 
 private:
     Xy position;
@@ -28,6 +29,7 @@ private:
     Game *game;
     GraphicBg *bg;
     QGraphicsScene *scene;
+    std::string name;
 };
 
 #endif

@@ -6,23 +6,23 @@
 #include <QGraphicsScene>
 #include <QString>
 #include <QColor>
-#include <QGraphicsRectItem>
 #include <QBrush>
-#include <QGraphicsTextItem>
 #include "../struct.h"
+#include "../image/GraphicsPixmapItem.h"
 
-class Game;
 
-class PushButton: public QGraphicsRectItem{
+class PushButton: public GraphicsPixmapItem{
 
 public:
-    PushButton(Game *game, QString txt, Xy pos, QColor color, Xy size, void (Game::*f)());
+    PushButton(Game *game, Xy pos, Xy size, void (Game::*f)(), std::string name, QPixmap *img);
     ~PushButton();
     void add();
     void remove();
     void is_clicked();
     bool is_it(Xy *coord);
     void set_pos(Xy coord);
+    std::string get_name();
+    Xy get_pos();
 
 private:
     Game *game;
@@ -33,7 +33,6 @@ private:
     QBrush *brush;
     QString base_text;
     QGraphicsTextItem *text_item;
-    Xy origin_pos;
     std::string name;
 };
 

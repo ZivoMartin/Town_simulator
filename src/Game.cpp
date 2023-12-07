@@ -6,11 +6,13 @@ Game::Game(GraphicsView *view): QMainWindow(){
     this->view = view;
     load_images();
     load_colors();
-    build_info_bubble();
     setup_scene();
+    build_info_bubble();
     init_game();
     play();
 }
+
+
 
 Game::~Game(){
     free_vec<Field*>(field_vec);
@@ -23,17 +25,19 @@ Game::~Game(){
 }
 
 
-template <typename K, typename V>
-void Game::free_map(std::map<K, V> map){
-    for(auto el: map){
-        delete map[el.first];
-    }
-}
-
 void Game::init_game(){
-    create_new_building("field", {34*CASE_SIZE, 28*CASE_SIZE});
-    create_new_building("shop", {36*CASE_SIZE, 22*CASE_SIZE});
-    create_new_building("house", {30*CASE_SIZE, 22*CASE_SIZE});
+    create_new_building("field", {34*CASE_SIZE, 30*CASE_SIZE});
+    create_new_building("shop", {38*CASE_SIZE, 22*CASE_SIZE});
+    create_new_building("house", {28*CASE_SIZE, 19*CASE_SIZE});
+    Xy pos = {screen_size.x-shop_setting_size.x, screen_size.y-shop_setting_size.y};
+    shop_menu_setting = new Setting(this, pos, shop_setting_size);
+    shop_menu_setting->add_img(new GraphicsPixmapItem(get_img("field"), view->get_scene(), {pos.x+200, pos.y+120}));
+    shop_menu_setting->add_img(new GraphicsPixmapItem(get_img("house"), view->get_scene(), {pos.x+400, pos.y+120}));
+    shop_menu_setting->add_img(new GraphicsPixmapItem(get_img("shop"), view->get_scene(), {pos.x+600, pos.y+120}));
+    Xy *s_shop_button = get_img_size("shop_icon");
+    PushButton *shop_button = new PushButton(this, {screen_size.x-s_shop_button->x, screen_size.y-s_shop_button->y}, *s_shop_button, &Game::open_shop, "open_shop", get_img("shop_icon"));
+    add_button(shop_button);
+    shop_button->add();
 }
 
 void Game::play(){
@@ -54,18 +58,20 @@ void Game::load_colors(){
     color_map["close_button"] = QColor(255, 0, 0);
     color_map["building_add_worker_button"] = QColor(50, 200, 0);
     color_map["building_less_worker_button"] = QColor(255, 200, 100);
-    color_map["set_info_color"] = QColor(100, 67, 200);
+    color_map["increase_worker"] = QColor(255, 255, 153);
+    color_map["decrease_worker"] = QColor(255, 133, 132);
+    color_map["lvl_info"] = QColor(200, 200, 200);
 }
 
 void Game::build_info_bubble(){
-    top_info["nb_gold"] = new InfoZone(this, {30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Golds: ", color_map["top_info"], CIRCLE);
-    top_info["nb_food"] = new InfoZone(this, {info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food: ", color_map["top_info"], CIRCLE);
-    top_info["nb_citizen"] = new InfoZone(this, {30+2*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizens: ", color_map["top_info"], CIRCLE);
-    top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], CIRCLE);
-    top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], CIRCLE);
-    top_info["nb_gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE);
-    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE);
-    top_info["nb_citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], CIRCLE);
+    top_info["nb_gold"] = new InfoZone(this, {30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Golds: ", color_map["top_info"], CIRCLE, "nb_gold");
+    top_info["nb_food"] = new InfoZone(this, {info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food: ", color_map["top_info"], CIRCLE, "nb_food");
+    top_info["nb_citizen"] = new InfoZone(this, {30+2*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizens: ", color_map["top_info"], CIRCLE, "nb_food");
+    top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], CIRCLE, "nb_worker");
+    top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], CIRCLE, "nb_non_worker");
+    top_info["nb_gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE, "nb_gold_ratio");
+    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "nb_food_ratio");
+    top_info["nb_citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], CIRCLE, "nb_citizen_ratio");
     
     top_info["nb_gold"]->set_value(BASE_GOLD);
     top_info["nb_food"]->set_value(BASE_FOOD);
@@ -75,14 +81,23 @@ void Game::build_info_bubble(){
     top_info["nb_gold_ratio"]->set_value(0.0);
     top_info["nb_food_ratio"]->set_value(-BASE_CITIZEN/10);
     top_info["nb_citizen_ratio"]->set_value(0.0);    
+
+    for(auto elt: top_info){
+        top_info[elt.first]->add();
+    }
 }
 
-
+void Game::open_shop(){
+    if(current_open_setting.setting != nullptr){
+        close_current_setting();
+    }
+    set_current_setting(shop_menu_setting, nullptr);
+}
 
 void Game::screen_clicked(Xy coord_click){
     if(its_a_button_click(&coord_click)){
 
-    }else if(current_open_setting == nullptr){
+    }else if(current_open_setting.setting == nullptr){
         build_tab_case *clicked_case = get_map_tab_case(coord_to_tab(&coord_click));
         if(clicked_case == nullptr){
 
@@ -92,8 +107,10 @@ void Game::screen_clicked(Xy coord_click){
     }
 }
 
-void Game::set_current_setting(build_tab_case *new_setting){
-    current_open_setting = new_setting;
+void Game::set_current_setting(Setting *setting, build_tab_case *building){
+    current_open_setting.setting = setting;
+    current_open_setting.building = building;
+    setting->open();
 }
 
 QColor Game::get_color(std::string color){
@@ -181,12 +198,6 @@ G Game::apply_get_method(build_tab_case *building, G (Building::*f)()){
     exit(EXIT_FAILURE);
 }
 
-template <typename T>
-void Game::free_vec(std::vector<T> vec){
-    for(unsigned int i=0; i<vec.size(); i++){
-        delete vec[i];
-    }
-}
 
 int Game::get_iter(){
     return iter;
@@ -195,13 +206,17 @@ bool Game::is_dragging(){
     return dragging.dragging;
 }
 void Game::load_images(){
-    std::string t[] = {"field", "house", "shop"};
+    std::string t[] = {"field", "house", "shop", "close_button", "less", "more", "shop_icon"};
 
-    dim_img_map["field"] = {80, 80};
-    dim_img_map["house"] = {80, 80};
-    dim_img_map["shop"] = {80, 80};
+    dim_img_map["field"] = {FIELD_WIDTH, FIELD_HEIGHT};
+    dim_img_map["house"] = {HOUSE_WIDTH, HOUSE_HEIGHT};
+    dim_img_map["shop"] = {SHOP_WIDTH, SHOP_HEIGHT};
+    dim_img_map["close_button"] = {30, 30};
+    dim_img_map["more"] = {30, 30};
+    dim_img_map["less"] = {30, 30};
+    dim_img_map["shop_icon"] = {120, 120};
 
-    for(int i=0; i<3; i++){ 
+    for(int i=0; i<7; i++){ 
         images_map[t[i]] = new QPixmap();
         images_map[t[i]]->load(QString::fromStdString("../images/"+ t[i] + ".png"));
         *images_map[t[i]] = images_map[t[i]]->scaled(dim_img_map[t[i]].x, dim_img_map[t[i]].y);
@@ -211,8 +226,10 @@ void Game::load_images(){
 void Game::setup_scene(){
     background_color = new QColor(128, 200, 42);
     view->set_bg_color(background_color);
-    view->set_size({MAP_WIDTH, MAP_HEIGHT});
-    // view->zoom(3);
+    QScreen *screen = QGuiApplication::primaryScreen();
+    this->screen_size = {screen->geometry().width() - 30, screen->geometry().height() - 30};
+    map_case_dim = {screen_size.x/CASE_SIZE, screen_size.y/CASE_SIZE};
+    view->set_size(screen_size);
 }
 
 GraphicsView *Game::get_view(){
@@ -342,8 +359,8 @@ build_tab_case *Game::get_map_tab_case(Xy pos){
     return nullptr;
 }    
 
-Xy *Game::get_size_setting(){
-    return &size_settings;
+Xy *Game::get_size_setting_building(){
+    return &size_settings_building;
 }
 
 
@@ -373,20 +390,10 @@ void Game::correct_pos(Xy *tab_pos, Xy *size){
     }
 }
 
-int random(int min, int max){
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_int_distribution<int> random_nbr(min, max);
-    return(random_nbr(generator));
-}
 
-
-int get_dist(Xy *coord1, Xy *coord2){
-    return (coord1->x-coord2->x)*(coord1->x-coord2->x) + (coord1->y-coord2->y)*(coord1->y-coord2->y);
-}
-
-void Game::close_setting(){
-    apply_get_method(current_open_setting, &Building::close_setting);
+void Game::close_current_setting(){
+    current_open_setting.setting->close();
+    current_open_setting = {nullptr, nullptr};
 }
 
 void Game::add_button(PushButton *new_button){
@@ -410,4 +417,18 @@ bool Game::its_a_button_click(Xy *pos){
         }
     }
     return false;
+}
+
+template <typename K, typename V>
+void free_map(std::map<K, V> map){
+    for(auto el: map){
+        delete map[el.first];
+    }
+}
+
+template <typename T>
+void free_vec(std::vector<T> vec){
+    for(unsigned int i=0; i<vec.size(); i++){
+        delete vec[i];
+    }
 }

@@ -16,11 +16,11 @@ public:
     void add();
     void remove();
     void set_pos(Xy pos);
+    form_type get_type();
 
 private:
     text_info_bg bg_union;
     Xy pos;
-    Xy origin;
     Xy size;
     QColor color;
     QGraphicsScene *scene;

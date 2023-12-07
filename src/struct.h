@@ -8,6 +8,7 @@ class Field;
 class House;
 class Shop;
 class InfoZone;
+class Setting;
 
 struct Xy{
     int x;
@@ -50,6 +51,11 @@ union form{
 struct text_info_bg{
     form_type type;
     form bg;
+};
+
+struct current_setting{
+    build_tab_case *building;
+    Setting *setting;
 };
 
 #endif

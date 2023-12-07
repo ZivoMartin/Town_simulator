@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include "../struct.h"
 
+class Game;
 
 class GraphicsPixmapItem : QGraphicsPixmapItem{
 
@@ -15,6 +16,8 @@ public:
     Xy *get_pos();
     void set_pos_img(Xy coord);
     Xy get_img_size();
+    void add_img();
+    void remove_img();
 
 private:
     QGraphicsScene *scene;

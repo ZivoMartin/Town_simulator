@@ -16,7 +16,6 @@ INCLUDEPATH += .
 # Input
 HEADERS += src/Game.h \
            src/struct.h \
-           src/application/Application.h \
            src/buildings/building.h \
            src/buildings/field.h \
            src/buildings/house.h \
@@ -26,10 +25,10 @@ HEADERS += src/Game.h \
            src/info_zone/info_zone.h \
            src/settings_building/settings.h \
            src/view/GraphicsView.h \
-           src/info_zone/graphic_bg.h
+           src/info_zone/graphic_bg.h \
+           src/common_functions/common_functions.h
 SOURCES += main.cpp \
            src/Game.cpp \
-           src/application/Application.cpp \
            src/buildings/building.cpp \
            src/buildings/field.cpp \
            src/buildings/house.cpp \
@@ -39,6 +38,7 @@ SOURCES += main.cpp \
            src/info_zone/info_zone.cpp \
            src/settings_building/settings.cpp \
            src/view/GraphicsView.cpp \
-           src/info_zone/graphic_bg.cpp
+           src/info_zone/graphic_bg.cpp \
+           src/common_functions/common_functions.cpp
 
 QT += widgets

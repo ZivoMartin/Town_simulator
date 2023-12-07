@@ -3,7 +3,6 @@
 GraphicsPixmapItem::GraphicsPixmapItem(QPixmap *image, QGraphicsScene *scene, Xy coord) : QGraphicsPixmapItem(*image){
     this->image = image;
     set_pos_img(coord);
-    scene->addItem(this);
     this->scene = scene;
 }
 
@@ -23,4 +22,12 @@ Xy *GraphicsPixmapItem::get_pos(){
 
 Xy GraphicsPixmapItem::get_img_size(){
     return {static_cast<int>(image->size().width()), static_cast<int>(image->size().width())};
+}
+
+void GraphicsPixmapItem::remove_img(){
+    scene->removeItem(this);
+}
+
+void GraphicsPixmapItem::add_img(){
+    scene->addItem(this);
 }

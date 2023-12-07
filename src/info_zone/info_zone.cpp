@@ -1,16 +1,20 @@
 #include "info_zone.h"
 #include "../Game.h"
 
-InfoZone::InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_type type_bg) : QGraphicsTextItem(txt){
+InfoZone::InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_type type_bg, std::string name) : QGraphicsTextItem(txt){
     position = pos;
     size = size;
     scene = game->get_view()->get_scene();
     this->game = game;
     base_text = txt;
     bg = new GraphicBg(type_bg, pos, size, color, scene);
-    this->setPos(pos.x+10, pos.y + size.y/4.5); 
+    if(type_bg == CIRCLE){
+        this->setPos(pos.x+10, pos.y+size.y/3.6); 
+    }else{
+        this->setPos(pos.x+10, pos.y); 
+    }
     this->setDefaultTextColor(QColor(0, 0, 0));
-    scene->addItem(this);
+    this->name = name;
 }
 
 InfoZone::~InfoZone(){
@@ -40,6 +44,18 @@ void InfoZone::remove(){
 
 void InfoZone::set_pos(Xy pos){
     this->position = pos;
-    this->setPos(pos.x+10, pos.y + size.y/4.5);
+    if(bg->get_type() == CIRCLE){
+        this->setPos(pos.x+10, pos.y+size.y/3.6); 
+    }else{
+        this->setPos(pos.x+10, pos.y); 
+    }
     bg->set_pos(pos); 
+}
+
+std::string InfoZone::get_name(){
+    return name;
+}
+
+Xy InfoZone::get_pos(){
+    return position;
 }

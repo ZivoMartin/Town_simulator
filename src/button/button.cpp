@@ -2,36 +2,25 @@
 #include "../Game.h"
 
 
-PushButton::PushButton(Game *game, QString txt, Xy pos, QColor color, Xy size, void (Game::*f)(), std::string name) : QGraphicsRectItem(pos.x, pos.y, size.x, size.y){
+PushButton::PushButton(Game *game, Xy pos, Xy size, void (Game::*f)(), std::string name, QPixmap *img) : GraphicsPixmapItem(img, game->get_view()->get_scene(), pos){
     this->game = game;
     this->scene = game->get_view()->get_scene();
     this->size = size;
-    this->origin_pos = pos;
-    this->pos = pos;
-    brush = new QBrush(color);
-    this->setBrush(*brush);
-    base_text = txt;
-    this->text_item = new QGraphicsTextItem(txt);
-    text_item->setPos(pos.x+3, pos.y); 
-    text_item->setDefaultTextColor(QColor(0, 0, 0));
     this->name = name;
     this->click = f;
+    set_pos(pos);
 }
 
-PushButton::~PushButton(){
-    delete brush;
-    delete text_item;
+PushButton::~PushButton(){   
 }
 
 void PushButton::remove(){
-    this->scene->removeItem(text_item);
-    this->scene->removeItem(this);
+    remove_img();
     game->erase_button(this);
 }
 
 void PushButton::add(){
-    this->scene->addItem(this);
-    this->scene->addItem(text_item);
+    add_img();
     game->add_button(this);
 }
 
@@ -44,7 +33,14 @@ void PushButton::is_clicked(){
 }
 
 void PushButton::set_pos(Xy coord){
-    setPos(coord.x - origin_pos.x, coord.y - origin_pos.y);
+    set_pos_img({coord.x+size.x/2, coord.y+size.y/2});
     this->pos = coord;
-    text_item->setPos(coord.x, coord.y);
+}
+
+Xy PushButton::get_pos(){
+    return pos;
+}
+
+std::string PushButton::get_name(){
+    return name;
 }
