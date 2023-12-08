@@ -419,6 +419,14 @@ bool Game::its_a_button_click(Xy *pos){
     return false;
 }
 
+void Game::add_worker(){
+    printf("add\n");
+}
+
+void Game::remove_worker(){
+    printf("remove\n");
+}
+
 template <typename K, typename V>
 void free_map(std::map<K, V> map){
     for(auto el: map){

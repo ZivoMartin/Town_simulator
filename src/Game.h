@@ -80,7 +80,9 @@ public:
     void add_button(PushButton *new_button);
     bool its_a_button_click(Xy *pos);
     void open_shop();
-
+    void add_worker();
+    void remove_worker();
+    
 private:
     GraphicsView *view;
     unsigned int iter = 0;

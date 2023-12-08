@@ -8,8 +8,8 @@ Field::Field(Game *game, Xy coord) : Building(game->get_img("field"), game, coor
     setting_union = new build_tab_case;
     setting_union->type = FIELD;
     setting_union->building.field = this;
-    setting->add_button(new PushButton(game, {coord.x+156, coord.y+44}, *game->get_img_size("more"), &Game::close_current_setting, "more_worker", game->get_img("more")));
-    setting->add_button(new PushButton(game, {coord.x+156, coord.y+84}, *game->get_img_size("less"), &Game::close_current_setting, "less_worker", game->get_img("less")));
+    setting->add_button(new PushButton(game, {coord.x+156, coord.y+44}, *game->get_img_size("more"), &Game::add_worker, "more_worker", game->get_img("more")));
+    setting->add_button(new PushButton(game, {coord.x+156, coord.y+84}, *game->get_img_size("less"), &Game::remove_worker, "less_worker", game->get_img("less")));
     setting->add_info_zone(new InfoZone(game, {coord.x+20, coord.y+44}, {130, 30}, "Add a worker", game->get_color("increase_worker"), RECT, "add_worker"));
     setting->add_info_zone(new InfoZone(game, {coord.x+20, coord.y+84}, {130, 30}, "Pull a worker", game->get_color("decrease_worker"), RECT, "pull_worker"));
     setting->add_info_zone(new InfoZone(game, {coord.x+20, coord.y+123}, {150, 30}, "Nb worker: ", game->get_color("increase_worker"), RECT, "nb_worker"));
