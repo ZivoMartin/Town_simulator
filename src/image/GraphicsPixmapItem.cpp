@@ -7,7 +7,9 @@ GraphicsPixmapItem::GraphicsPixmapItem(QPixmap *image, QGraphicsScene *scene, Xy
 }
 
 GraphicsPixmapItem::~GraphicsPixmapItem(){   
-    scene->removeItem(this);
+    if(is_display){
+        scene->removeItem(this);
+    }
 }
 
 void GraphicsPixmapItem::set_pos_img(Xy pos){
@@ -26,8 +28,10 @@ Xy GraphicsPixmapItem::get_img_size(){
 
 void GraphicsPixmapItem::remove_img(){
     scene->removeItem(this);
+    is_display = false;
 }
 
 void GraphicsPixmapItem::add_img(){
     scene->addItem(this);
+    is_display = true;
 }

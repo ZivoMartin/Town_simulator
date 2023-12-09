@@ -20,30 +20,51 @@ Game::~Game(){
     free_vec<House*>(house_vec);
     free_map(images_map);
     free_map(top_info);
+
+    if(try_to_buy != EMPTY){
+        delete try_to_buy_img;
+    }
+
+    delete shop_menu_setting;
     delete background_color;
     delete view;
 }
 
 
 void Game::init_game(){
+    current_stat["gold"] = BASE_GOLD;
+    current_stat["food"] = BASE_FOOD;
+    current_stat["citizen"] = BASE_CITIZEN;
+
+    building_price["shop"] = 50;
+    building_price["house"] = 25;
+    building_price["field"] = 50;
+    
+    Xy pos = {screen_size.x-shop_setting_size.x, screen_size.y-shop_setting_size.y};
+
+    shop_img_pos["field"] = {pos.x+200, pos.y+120};
+    shop_img_pos["house"] = {pos.x+400, pos.y+120};
+    shop_img_pos["shop"] = {pos.x+600, pos.y+120};
+
+    shop_menu_setting = new Setting(this, pos, shop_setting_size);
+    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["field"], *get_img_size("field"), &Game::try_to_buy_field, "buy_field", get_img("field")));
+    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["house"], *get_img_size("house"), &Game::try_to_buy_house, "buy_house", get_img("house")));
+    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["shop"], *get_img_size("shop"), &Game::try_to_buy_shop, "buy_shop", get_img("shop")));
+
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+230, pos.y+120+FIELD_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "field"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+430, pos.y+120+HOUSE_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "house"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+630, pos.y+120+SHOP_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "shop"));
+
+    Xy *s_shop_button = get_img_size("shop_icon");
+    PushButton *shop_button = new PushButton(this, {screen_size.x-s_shop_button->x, screen_size.y-s_shop_button->y}, *s_shop_button, &Game::open_shop, "open_shop", get_img("shop_icon"));
+    add_button(shop_button);
+    shop_button->add();
     create_new_building("field", {34*CASE_SIZE, 30*CASE_SIZE});
     create_new_building("shop", {38*CASE_SIZE, 22*CASE_SIZE});
     create_new_building("house", {28*CASE_SIZE, 19*CASE_SIZE});
     create_new_building("house", {35*CASE_SIZE, 15*CASE_SIZE});
     
-    current_stat["gold"] = BASE_GOLD;
-    current_stat["food"] = BASE_FOOD;
-    current_stat["citizen"] = BASE_CITIZEN;
-    
-    Xy pos = {screen_size.x-shop_setting_size.x, screen_size.y-shop_setting_size.y};
-    shop_menu_setting = new Setting(this, pos, shop_setting_size);
-    shop_menu_setting->add_img(new GraphicsPixmapItem(get_img("field"), view->get_scene(), {pos.x+200, pos.y+120}));
-    shop_menu_setting->add_img(new GraphicsPixmapItem(get_img("house"), view->get_scene(), {pos.x+400, pos.y+120}));
-    shop_menu_setting->add_img(new GraphicsPixmapItem(get_img("shop"), view->get_scene(), {pos.x+600, pos.y+120}));
-    Xy *s_shop_button = get_img_size("shop_icon");
-    PushButton *shop_button = new PushButton(this, {screen_size.x-s_shop_button->x, screen_size.y-s_shop_button->y}, *s_shop_button, &Game::open_shop, "open_shop", get_img("shop_icon"));
-    add_button(shop_button);
-    shop_button->add();
+
 }
 
 void Game::play(){
@@ -67,6 +88,7 @@ void Game::load_colors(){
     color_map["increase_worker"] = QColor(255, 255, 153);
     color_map["decrease_worker"] = QColor(255, 133, 132);
     color_map["lvl_info"] = QColor(200, 200, 200);
+    color_map["price"] = QColor(255, 255, 153);
 }
 
 void Game::build_info_bubble(){
@@ -181,12 +203,26 @@ void Game::click_release(Xy stop_pos){
             }
         }
         dragging.dragging = false;
-    }    
+    }else if(try_to_buy != EMPTY){
+        delete try_to_buy_img;
+        std::string str = "shop"; 
+        if(try_to_buy == FIELD) str = "field";
+        if(try_to_buy == HOUSE) str = "house";
+
+        if(create_new_building(str, stop_pos)){
+            current_stat["gold"] -= building_price[str] - price_to_add;
+            top_info["nb_gold"]->set_value(static_cast<int>(current_stat["gold"]));
+        }
+
+        try_to_buy = EMPTY;
+    }
 }
 
 void Game::mouse_move(Xy pos){
     if(is_dragging()){
         apply_method_1(&dragging.item, &Building::drag, pos);
+    }else if(try_to_buy != EMPTY){
+        try_to_buy_img->set_pos_img(pos);
     }
 }
 
@@ -227,7 +263,7 @@ bool Game::is_dragging(){
     return dragging.dragging;
 }
 void Game::load_images(){
-    std::string t[] = {"field", "house", "shop", "close_button", "less", "more", "shop_icon"};
+    std::string t[] = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been"};
 
     dim_img_map["field"] = {FIELD_WIDTH, FIELD_HEIGHT};
     dim_img_map["house"] = {HOUSE_WIDTH, HOUSE_HEIGHT};
@@ -236,8 +272,9 @@ void Game::load_images(){
     dim_img_map["more"] = {30, 30};
     dim_img_map["less"] = {30, 30};
     dim_img_map["shop_icon"] = {120, 120};
+    dim_img_map["been"] = {30, 30};
 
-    for(int i=0; i<7; i++){ 
+    for(int i=0; i<8; i++){ 
         images_map[t[i]] = new QPixmap();
         images_map[t[i]]->load(QString::fromStdString("../images/"+ t[i] + ".png"));
         *images_map[t[i]] = images_map[t[i]]->scaled(dim_img_map[t[i]].x, dim_img_map[t[i]].y);
@@ -271,7 +308,7 @@ Xy *Game::get_img_size(std::string img){
     return &dim_img_map[img];
 }
 
-void Game::create_new_building(std::string type, Xy pos){
+bool Game::create_new_building(std::string type, Xy pos){
     if (is_empty_place(&pos, get_img_size(type))){
         if (type == "shop") {
             Shop *new_building = new Shop(this, pos);
@@ -286,7 +323,12 @@ void Game::create_new_building(std::string type, Xy pos){
             field_vec.push_back(new_building);
             this->new_building(new_building, &Game::set_case_field);
         }
+        update_gold_ratio();
+        building_price[type] += price_to_add;
+        shop_menu_setting->get_info_zone(type)->set_value(building_price[type]);
+        return true;
     }
+    return false;
 }
 
 template <typename T>
@@ -469,7 +511,7 @@ void Game::remove_worker(){
 }
 
 void Game::update_food_ratio(){
-    float new_food_ratio = -(nb_citizen/10);
+    float new_food_ratio = -(float(nb_citizen)/10);
     for(unsigned int i = 0; i<field_vec.size(); i++){
         new_food_ratio += field_vec[i]->get_efficiency();
     }
@@ -478,11 +520,47 @@ void Game::update_food_ratio(){
 
 void Game::update_gold_ratio(){
     int nb_building = field_vec.size()+shop_vec.size()+house_vec.size();
-    float new_gold_ratio = -(nb_building/3);
+    float new_gold_ratio = -(float(nb_building)/3);
     for(unsigned int i = 0; i<shop_vec.size(); i++){
         new_gold_ratio += shop_vec[i]->get_efficiency();
     }
     top_info["gold_ratio"]->set_value(new_gold_ratio);
+}
+
+void Game::try_to_buy_shop(){
+    if(current_stat["gold"] >= building_price["shop"]){
+        try_to_buy = SHOP;
+        try_to_buy_img = new GraphicsPixmapItem(get_img("shop"), view->get_scene(), shop_img_pos["shop"]);
+        try_to_buy_img->add_img();
+    }
+}
+
+void Game::try_to_buy_house(){
+    if(current_stat["gold"] >= building_price["house"]){
+        try_to_buy = HOUSE;
+        try_to_buy_img = new GraphicsPixmapItem(get_img("house"), view->get_scene(), shop_img_pos["house"]);
+        try_to_buy_img->add_img();
+    }
+}
+
+void Game::try_to_buy_field(){
+    if(current_stat["gold"] >= building_price["field"]){
+        try_to_buy = FIELD;
+        try_to_buy_img = new GraphicsPixmapItem(get_img("field"), view->get_scene(), shop_img_pos["field"]);
+        try_to_buy_img->add_img();
+    }
+}
+
+void Game::set_max_citizen(int x){
+    max_citizen = x;
+}
+
+int Game::get_max_citizen(){
+    return max_citizen;
+}
+
+void Game::sold_building(){
+    printf("Sold\n");
 }
 
 template <typename K, typename V>

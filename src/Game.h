@@ -53,7 +53,7 @@ public:
     Xy *get_img_size(std::string img);
     Xy coord_to_tab(Xy *entry);
     Xy tab_to_coord(Xy *entry);
-    void create_new_building(std::string type, Xy pos);
+    bool create_new_building(std::string type, Xy pos);
     template <typename T> void new_building(T *new_building, void (Game::*f)(Xy, T*));
     template <typename T, typename G> G apply_method_1(build_tab_case *building, G (Building::*f)(T), T arg);
     template <typename G> G apply_method_0(build_tab_case *building, G (Building::*f)());
@@ -84,6 +84,12 @@ public:
     void remove_worker();
     void update_food_ratio();
     void update_gold_ratio();
+    void try_to_buy_shop();
+    void try_to_buy_house();
+    void try_to_buy_field();
+    void set_max_citizen(int x);
+    int get_max_citizen();
+    void sold_building();
     
 private:
     GraphicsView *view;
@@ -95,6 +101,8 @@ private:
     std::map<std::string, InfoZone*> top_info;
     std::map<int, build_tab_case> map_tab;
     std::map<std::string, float> current_stat;
+    std::map<std::string, int> building_price;
+    std::map<std::string, Xy> shop_img_pos;
 
     std::vector<Field*> field_vec;
     std::vector<House*> house_vec;
@@ -111,11 +119,14 @@ private:
     Xy shop_setting_size = {800, 300};
     Setting *shop_menu_setting;
     QGraphicsPixmapItem *bg_img;
+    type_building try_to_buy = EMPTY;
+    GraphicsPixmapItem *try_to_buy_img = nullptr;
 
+    int price_to_add = 25;
     int nb_citizen = BASE_CITIZEN;
     int nb_worker = 0;
     int nb_unemployed = BASE_CITIZEN;
-    int max_citizen = 14;
+    int max_citizen = 0;
 
     float factor_citizen_ratio = 800;
 };

@@ -13,6 +13,9 @@ Setting::Setting(Game *game, Xy pos, Xy size) : QGraphicsRectItem(0, 0, size.x, 
 }
 
 Setting::~Setting(){
+    if(is_open){
+        close();
+    }
     delete brush;
     delete close_button;
     free_map(button_map);

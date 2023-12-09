@@ -23,6 +23,7 @@ private:
     QGraphicsScene *scene;
     Xy position;
     QPixmap *image;
+    bool is_display = false;
 };
 
 #endif

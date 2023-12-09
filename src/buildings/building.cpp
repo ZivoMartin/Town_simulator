@@ -6,6 +6,7 @@ Building::Building(QPixmap *image, Game *game, Xy coord) : GraphicsPixmapItem(im
     origin_pos = coord;
     this->game = game;
     setting = new Setting(game, coord, *game->get_size_setting_building());
+    setting->add_button(new PushButton(game, {coord.x+330, coord.y+160}, *game->get_img_size("been"), &Game::sold_building, "been", game->get_img("been")));
     this->add_img();
 }
 
