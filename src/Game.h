@@ -117,7 +117,7 @@ private:
     int nb_unemployed = BASE_CITIZEN;
     int max_citizen = 14;
 
-    float factor_citizen_ratio = 4000;
+    float factor_citizen_ratio = 800;
 };
 
 #endif

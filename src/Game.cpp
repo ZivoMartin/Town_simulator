@@ -142,6 +142,9 @@ void Game::update_info(){
             top_info["citizen_ratio"]->set_value(new_citizen_nb/factor_citizen_ratio);
             top_info["nb_citizen"]->set_value(new_citizen_nb);
             top_info["nb_non_worker"]->set_value(top_info["nb_non_worker"]->get_value() + (new_citizen_nb-display_citizen_nb));
+            nb_citizen = new_citizen_nb;
+            nb_unemployed += (new_citizen_nb-display_citizen_nb);
+            update_food_ratio();
         }
     }
 }
@@ -492,6 +495,6 @@ void free_map(std::map<K, V> map){
 template <typename T>
 void free_vec(std::vector<T> vec){
     for(unsigned int i=0; i<vec.size(); i++){
-        delete vec[i];
+        delete vec[i];  
     }
 }
