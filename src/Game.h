@@ -55,8 +55,8 @@ public:
     Xy tab_to_coord(Xy *entry);
     void create_new_building(std::string type, Xy pos);
     template <typename T> void new_building(T *new_building, void (Game::*f)(Xy, T*));
-    template <typename T, typename G> G apply_method(build_tab_case *building, G (Building::*f)(T), T arg);
-    template <typename G> G apply_get_method(build_tab_case *building, G (Building::*f)());
+    template <typename T, typename G> G apply_method_1(build_tab_case *building, G (Building::*f)(T), T arg);
+    template <typename G> G apply_method_0(build_tab_case *building, G (Building::*f)());
     void erase_zone(Xy *pos, Xy *s);
     void set_case_field(Xy pos, Field *field);
     void set_case_shop(Xy pos, Shop *shop);
@@ -82,6 +82,8 @@ public:
     void open_shop();
     void add_worker();
     void remove_worker();
+    void update_food_ratio();
+    void update_gold_ratio();
     
 private:
     GraphicsView *view;
@@ -92,12 +94,13 @@ private:
     std::map<std::string, QColor> color_map;
     std::map<std::string, InfoZone*> top_info;
     std::map<int, build_tab_case> map_tab;
+    std::map<std::string, float> current_stat;
 
     std::vector<Field*> field_vec;
     std::vector<House*> house_vec;
     std::vector<Shop*> shop_vec;
     std::vector<PushButton*> button_vec;
-    
+
     drag dragging;
     QColor *background_color;
     Xy info_bubble_dims = {180, 70};
@@ -107,6 +110,14 @@ private:
     Xy screen_size;
     Xy shop_setting_size = {800, 300};
     Setting *shop_menu_setting;
+    QGraphicsPixmapItem *bg_img;
+
+    int nb_citizen = BASE_CITIZEN;
+    int nb_worker = 0;
+    int nb_unemployed = BASE_CITIZEN;
+    int max_citizen = 14;
+
+    float factor_citizen_ratio = 4000;
 };
 
 #endif

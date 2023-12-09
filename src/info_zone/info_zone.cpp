@@ -21,7 +21,7 @@ InfoZone::~InfoZone(){
     delete bg;
 }
 
-int InfoZone::get_value(){
+float InfoZone::get_value(){
     return value;
 }
 

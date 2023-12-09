@@ -14,7 +14,7 @@ public:
     InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_type type_bg, std::string name);
     ~InfoZone();
     void set_value(float x);
-    int get_value();
+    float get_value();
     void add();
     void remove();
     void set_pos(Xy pos);
@@ -24,7 +24,7 @@ public:
 private:
     Xy position;
     Xy size;
-    int value;
+    float value;
     QString base_text;
     Game *game;
     GraphicBg *bg;

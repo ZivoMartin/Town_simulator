@@ -5,7 +5,7 @@ int Shop::max_worker[4] = {6, 8, 10, 12};
 
 
 Shop::Shop(Game *game, Xy coord) : Building(game->get_img("shop"), game, coord){
-    value_per_worker = 2;
+    value_per_worker = 0.2;
     setting_union = new build_tab_case;
     setting_union->type = SHOP;
     setting_union->building.shop = this;
@@ -22,3 +22,24 @@ Shop::Shop(Game *game, Xy coord) : Building(game->get_img("shop"), game, coord){
     setting->get_info_zone("lvl")->set_value(0.0);
 }
 Shop::~Shop(){}
+
+    
+bool Shop::add_worker(){
+    if(nb_worker < max_worker[lvl]){
+        nb_worker += 1;
+        setting->get_info_zone("nb_worker")->set_value(setting->get_info_zone("nb_worker")->get_value() +1);   
+        game->update_gold_ratio();
+        return true;
+    }
+    return false;
+}
+
+bool Shop::pull_worker(){
+    if(nb_worker>0){
+        nb_worker -= 1;
+        setting->get_info_zone("nb_worker")->set_value(setting->get_info_zone("nb_worker")->get_value() -1);
+        game->update_gold_ratio();
+        return true;
+    }
+    return false;
+}

@@ -15,20 +15,12 @@ Building::~Building(){
     }
 }
 
-void Building::set_worker(int x){
-    nb_worker += x;
-}
-
 int Building::get_nb_worker(){
     return nb_worker;
 }
 
 int Building::get_level(){
     return lvl;
-}
-
-void Building::level_up(){
-    lvl += 1;
 }
 
 void Building::drag(Xy new_pos){
@@ -49,7 +41,7 @@ Xy Building::get_size(){
     return get_img_size();
 }
 
-int Building::get_efficiency(){
+float Building::get_efficiency(){
     return value_per_worker*nb_worker;
 }
 

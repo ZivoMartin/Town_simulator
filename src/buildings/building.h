@@ -19,13 +19,15 @@ public:
     void drag(Xy new_pos);
     Xy get_size();
     void set_origin_pos(Xy new_pos);
-    virtual int get_efficiency();
+    float get_efficiency();
     virtual void clicked();
+    virtual bool add_worker() = 0;
+    virtual bool pull_worker() = 0;
 
 protected:
     Game *game;
     int nb_worker = 0;
-    int value_per_worker = 0;
+    float value_per_worker = 0;
     int lvl = 0;
     Xy origin_pos;
     Setting *setting;

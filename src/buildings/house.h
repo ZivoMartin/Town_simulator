@@ -10,6 +10,8 @@ class House: public Building{
 public:
     House(Game *game, Xy coord);
     ~House();
+    bool add_worker() override;
+    bool pull_worker() override;
 
 private:
     static int max_worker[4];

@@ -10,6 +10,8 @@ class Field: public Building{
 public:
     Field(Game *game, Xy coord);
     ~Field();
+    bool add_worker() override;
+    bool pull_worker() override;
 
 private:
     static int max_worker[4];

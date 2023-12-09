@@ -4,7 +4,7 @@
 int Field::max_worker[4] = {6, 8, 10, 12};
 
 Field::Field(Game *game, Xy coord) : Building(game->get_img("field"), game, coord){
-    value_per_worker = 3;
+    value_per_worker = 0.3;
     setting_union = new build_tab_case;
     setting_union->type = FIELD;
     setting_union->building.field = this;
@@ -24,4 +24,25 @@ Field::Field(Game *game, Xy coord) : Building(game->get_img("field"), game, coor
 
 Field::~Field(){
 
+}
+
+
+bool Field::add_worker(){
+    if(nb_worker < max_worker[lvl]){
+        nb_worker += 1;
+        setting->get_info_zone("nb_worker")->set_value(setting->get_info_zone("nb_worker")->get_value() +1); 
+        game->update_food_ratio();  
+        return true;
+    }
+    return false;
+}
+
+bool Field::pull_worker(){
+    if(nb_worker>0){
+        nb_worker -= 1;
+        setting->get_info_zone("nb_worker")->set_value(setting->get_info_zone("nb_worker")->get_value() -1);
+        game->update_food_ratio();
+        return true;
+    }
+    return false;
 }

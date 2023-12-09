@@ -29,6 +29,12 @@ void Game::init_game(){
     create_new_building("field", {34*CASE_SIZE, 30*CASE_SIZE});
     create_new_building("shop", {38*CASE_SIZE, 22*CASE_SIZE});
     create_new_building("house", {28*CASE_SIZE, 19*CASE_SIZE});
+    create_new_building("house", {35*CASE_SIZE, 15*CASE_SIZE});
+    
+    current_stat["gold"] = BASE_GOLD;
+    current_stat["food"] = BASE_FOOD;
+    current_stat["citizen"] = BASE_CITIZEN;
+    
     Xy pos = {screen_size.x-shop_setting_size.x, screen_size.y-shop_setting_size.y};
     shop_menu_setting = new Setting(this, pos, shop_setting_size);
     shop_menu_setting->add_img(new GraphicsPixmapItem(get_img("field"), view->get_scene(), {pos.x+200, pos.y+120}));
@@ -69,18 +75,18 @@ void Game::build_info_bubble(){
     top_info["nb_citizen"] = new InfoZone(this, {30+2*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizens: ", color_map["top_info"], CIRCLE, "nb_food");
     top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], CIRCLE, "nb_worker");
     top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], CIRCLE, "nb_non_worker");
-    top_info["nb_gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE, "nb_gold_ratio");
-    top_info["nb_food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "nb_food_ratio");
-    top_info["nb_citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], CIRCLE, "nb_citizen_ratio");
+    top_info["gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE, "gold_ratio");
+    top_info["food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "food_ratio");
+    top_info["citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], CIRCLE, "nb_citizen_ratio");
     
     top_info["nb_gold"]->set_value(BASE_GOLD);
     top_info["nb_food"]->set_value(BASE_FOOD);
     top_info["nb_citizen"]->set_value(BASE_CITIZEN);
     top_info["nb_worker"]->set_value(0.0);
     top_info["nb_non_worker"]->set_value(BASE_CITIZEN);
-    top_info["nb_gold_ratio"]->set_value(0.0);
-    top_info["nb_food_ratio"]->set_value(-BASE_CITIZEN/10);
-    top_info["nb_citizen_ratio"]->set_value(0.0);    
+    top_info["gold_ratio"]->set_value(-1);
+    top_info["food_ratio"]->set_value(-BASE_CITIZEN/10);
+    top_info["citizen_ratio"]->set_value(BASE_CITIZEN/factor_citizen_ratio);    
 
     for(auto elt: top_info){
         top_info[elt.first]->add();
@@ -118,28 +124,40 @@ QColor Game::get_color(std::string color){
 }
 
 void Game::update_info(){
-    top_info["nb_gold"]->set_value(top_info["nb_gold"]->get_value()+top_info["nb_gold_ratio"]->get_value());
-    float new_food = top_info["nb_food"]->get_value()+top_info["nb_food_ratio"]->get_value();
+    current_stat["gold"] += top_info["gold_ratio"]->get_value();
+    top_info["nb_gold"]->set_value(static_cast<int>(current_stat["gold"]));
+    float new_food = current_stat["food"]+top_info["food_ratio"]->get_value();
     if(new_food > 0){
-        top_info["nb_food"]->set_value(new_food);    
+        current_stat["food"] = new_food;
+        top_info["nb_food"]->set_value(static_cast<int>(new_food));    
     }else{
-        top_info["nb_citizen"]->set_value(top_info["nb_food"]->get_value()-1);
+        current_stat["citizen"] -= 1;
+        top_info["nb_citizen"]->set_value(static_cast<int>(current_stat["citizen"]));
     }
-    
+    current_stat["citizen"] += top_info["citizen_ratio"]->get_value();
+    int new_citizen_nb = current_stat["citizen"];
+    int display_citizen_nb = top_info["nb_citizen"]->get_value();
+    if(new_citizen_nb > display_citizen_nb){
+        if(new_citizen_nb <= max_citizen){
+            top_info["citizen_ratio"]->set_value(new_citizen_nb/factor_citizen_ratio);
+            top_info["nb_citizen"]->set_value(new_citizen_nb);
+            top_info["nb_non_worker"]->set_value(top_info["nb_non_worker"]->get_value() + (new_citizen_nb-display_citizen_nb));
+        }
+    }
 }
 
 void Game::click_release(Xy stop_pos){
     if(is_dragging()){
-        Xy *origin_pos = apply_get_method(&dragging.item, &Building::get_origin_pos);
-        Xy *current_pos = apply_get_method(&dragging.item, &Building::get_current_pos);
+        Xy *origin_pos = apply_method_0(&dragging.item, &Building::get_origin_pos);
+        Xy *current_pos = apply_method_0(&dragging.item, &Building::get_current_pos);
         if(origin_pos->x != current_pos->x || origin_pos->y != current_pos->y){
-            Xy size = apply_get_method(&dragging.item, &Building::get_size);
+            Xy size = apply_method_0(&dragging.item, &Building::get_size);
             Xy tab_new_pos = coord_to_tab(&stop_pos);
             correct_pos(&tab_new_pos, &size);
             stop_pos = tab_to_coord(&tab_new_pos);
             if(is_empty_place(&stop_pos, &size)){
                 erase_zone(origin_pos, &size);
-                apply_method(&dragging.item, &Building::set_origin_pos, stop_pos);
+                apply_method_1(&dragging.item, &Building::set_origin_pos, stop_pos);
                 if(dragging.item.type == FIELD){
                     new_building(dragging.item.building.field, &Game::set_case_field);
                 }else if(dragging.item.type == HOUSE){
@@ -148,7 +166,7 @@ void Game::click_release(Xy stop_pos){
                     new_building(dragging.item.building.shop, &Game::set_case_shop);
                 }
             }else{
-                apply_method(&dragging.item, &Building::drag, *origin_pos);
+                apply_method_1(&dragging.item, &Building::drag, *origin_pos);
             }
         }else{
             if(dragging.item.type == FIELD){
@@ -165,12 +183,12 @@ void Game::click_release(Xy stop_pos){
 
 void Game::mouse_move(Xy pos){
     if(is_dragging()){
-        apply_method(&dragging.item, &Building::drag, pos);
+        apply_method_1(&dragging.item, &Building::drag, pos);
     }
 }
 
 template <typename T, typename G>
-G Game::apply_method(build_tab_case *building, G (Building::*f)(T), T arg){
+G Game::apply_method_1(build_tab_case *building, G (Building::*f)(T), T arg){
     switch (building->type){
         case FIELD:
             return (building->building.field->*f)(arg);
@@ -184,7 +202,7 @@ G Game::apply_method(build_tab_case *building, G (Building::*f)(T), T arg){
 }
 
 template <typename G>
-G Game::apply_get_method(build_tab_case *building, G (Building::*f)()){
+G Game::apply_method_0(build_tab_case *building, G (Building::*f)()){
     switch (building->type){
         case FIELD:
             return (building->building.field->*f)();
@@ -221,6 +239,8 @@ void Game::load_images(){
         images_map[t[i]]->load(QString::fromStdString("../images/"+ t[i] + ".png"));
         *images_map[t[i]] = images_map[t[i]]->scaled(dim_img_map[t[i]].x, dim_img_map[t[i]].y);
     }
+    images_map["bg"] = new QPixmap();
+    images_map["bg"]->load(QString::fromStdString("../images/bg.png"));
 }
 
 void Game::setup_scene(){
@@ -230,6 +250,10 @@ void Game::setup_scene(){
     this->screen_size = {screen->geometry().width() - 30, screen->geometry().height() - 30};
     map_case_dim = {screen_size.x/CASE_SIZE, screen_size.y/CASE_SIZE};
     view->set_size(screen_size);
+    // bg_img = new QGraphicsPixmapItem(*images_map["bg"]);
+    // bg_img->setTransformOriginPoint(images_map["bg"]->rect().center());
+    // bg_img->setScale(qreal(view->get_scene()->width()) / qreal(images_map["bg"]->width()), 
+    //                          qreal(view->get_scene()->height()) / qreal(images_map["bg"]->height()));
 }
 
 GraphicsView *Game::get_view(){
@@ -420,11 +444,42 @@ bool Game::its_a_button_click(Xy *pos){
 }
 
 void Game::add_worker(){
-    printf("add\n");
+    if(nb_worker<nb_citizen){
+        if(apply_method_0(current_open_setting.building, &Building::add_worker)){
+            nb_worker += 1;
+            nb_unemployed -= 1;
+            top_info["nb_worker"]->set_value(nb_worker);
+            top_info["nb_non_worker"]->set_value(nb_unemployed);
+        }
+    }
 }
 
 void Game::remove_worker(){
-    printf("remove\n");
+    if(nb_unemployed<nb_citizen){
+        if(apply_method_0(current_open_setting.building, &Building::pull_worker)){
+            nb_worker -= 1;
+            nb_unemployed += 1;
+            top_info["nb_worker"]->set_value(nb_worker);
+            top_info["nb_non_worker"]->set_value(nb_unemployed);
+        }
+    }
+}
+
+void Game::update_food_ratio(){
+    float new_food_ratio = -(nb_citizen/10);
+    for(unsigned int i = 0; i<field_vec.size(); i++){
+        new_food_ratio += field_vec[i]->get_efficiency();
+    }
+    top_info["food_ratio"]->set_value(new_food_ratio);
+}
+
+void Game::update_gold_ratio(){
+    int nb_building = field_vec.size()+shop_vec.size()+house_vec.size();
+    float new_gold_ratio = -(nb_building/3);
+    for(unsigned int i = 0; i<shop_vec.size(); i++){
+        new_gold_ratio += shop_vec[i]->get_efficiency();
+    }
+    top_info["gold_ratio"]->set_value(new_gold_ratio);
 }
 
 template <typename K, typename V>
