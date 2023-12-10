@@ -20,11 +20,13 @@ public:
     void set_pos(Xy pos);
     Xy get_pos();
     std::string get_name();
+    void set_base_text(QString new_base_text);
+    void decal_txt(Xy decal);
 
 private:
     Xy position;
     Xy size;
-    float value;
+    float value = 0.0;
     QString base_text;
     Game *game;
     GraphicBg *bg;

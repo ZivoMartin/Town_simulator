@@ -117,7 +117,7 @@ private:
     QColor *background_color;
     Xy info_bubble_dims = {180, 70};
     Xy map_case_dim;
-    Xy size_settings_building = {400, 200};
+    Xy size_settings_building = {400, 230};
     current_setting current_open_setting = {nullptr, nullptr};
     Xy screen_size;
     Xy shop_setting_size = {800, 300};

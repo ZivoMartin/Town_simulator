@@ -89,6 +89,8 @@ void Game::load_colors(){
     color_map["decrease_worker"] = QColor(255, 133, 132);
     color_map["lvl_info"] = QColor(200, 200, 200);
     color_map["price"] = QColor(255, 255, 153);
+    color_map["upgrade_price"] = QColor(0, 255, 0);
+    color_map["sold_price"] = QColor(255, 0, 0);
 }
 
 void Game::build_info_bubble(){
@@ -594,10 +596,12 @@ void Game::kik_workers(int x){
 }
 
 void Game::lvl_up(){
-    if(current_stat["gold"] >= building_price["shop"]){
-        try_to_buy = SHOP;
-        try_to_buy_img = new GraphicsPixmapItem(get_img("shop"), view->get_scene(), shop_img_pos["shop"]);
-        try_to_buy_img->add_img();
+    int price = apply_method_0(current_open_setting.building, &Building::get_price_to_up);
+    if(current_stat["gold"] >= price){
+        increase_gold(-price);
+        apply_method_0(current_open_setting.building, &Building::lvl_up);
+        update_gold_ratio();
+        update_food_ratio();
     }
 }
 

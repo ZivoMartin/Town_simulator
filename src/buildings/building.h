@@ -19,12 +19,16 @@ public:
     void drag(Xy new_pos);
     Xy get_size();
     void set_origin_pos(Xy new_pos);
+    float get_efficiency();
     virtual void clicked();
-    virtual float get_efficiency() = 0;
     virtual bool add_worker() = 0;
     virtual bool pull_worker() = 0;
-    virtual int get_value_for_sold() = 0;
+    virtual void init_stat() = 0;
+    int get_price_to_up();
     void sold();
+    void lvl_up();
+    void init_common_value();
+    void init_setting(Xy coord);
 
 protected:
     Game *game;
@@ -34,7 +38,10 @@ protected:
     Setting *setting;
     build_tab_case *setting_union;
 
-    int value_for_sold[];
+    std::vector<int> max_worker;
+    std::vector<float> value_per_worker;
+    std::vector<int> value_for_sold;
+    std::vector<int> price_to_up;
 
 
 };

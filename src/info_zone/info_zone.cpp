@@ -9,10 +9,11 @@ InfoZone::InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_
     base_text = txt;
     bg = new GraphicBg(type_bg, pos, size, color, scene);
     if(type_bg == CIRCLE){
-        this->setPos(pos.x+10, pos.y+size.y/3.6); 
+        position = {pos.x+10, static_cast<int>(pos.y+size.y/3.6)}; 
     }else{
-        this->setPos(pos.x+10, pos.y); 
+        position = {pos.x+10, pos.y}; 
     }
+    this->setPos(position.x, position.y); 
     this->setDefaultTextColor(QColor(0, 0, 0));
     this->name = name;
 }
@@ -23,6 +24,11 @@ InfoZone::~InfoZone(){
 
 float InfoZone::get_value(){
     return value;
+}
+
+void InfoZone::set_base_text(QString new_base_text){
+    this->base_text = new_base_text;
+    set_value(value);
 }
 
 void InfoZone::set_value(float x){
@@ -58,4 +64,9 @@ std::string InfoZone::get_name(){
 
 Xy InfoZone::get_pos(){
     return position;
+}
+
+void InfoZone::decal_txt(Xy decal){
+    position = {position.x + decal.x, position.y + position.y};
+    this->setPos(position.x, position.y);
 }
