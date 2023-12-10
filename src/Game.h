@@ -57,6 +57,7 @@ public:
     template <typename T> void new_building(T *new_building, void (Game::*f)(Xy, T*));
     template <typename T, typename G> G apply_method_1(build_tab_case *building, G (Building::*f)(T), T arg);
     template <typename G> G apply_method_0(build_tab_case *building, G (Building::*f)());
+    template <typename T> void remove_elt(std::vector<T> *vec, T elt);
     void erase_zone(Xy *pos, Xy *s);
     void set_case_field(Xy pos, Field *field);
     void set_case_shop(Xy pos, Shop *shop);
@@ -90,6 +91,9 @@ public:
     void set_max_citizen(int x);
     int get_max_citizen();
     void sold_building();
+    void increase_gold(int x);
+    void kik_workers(int x);
+    void lvl_up();
     
 private:
     GraphicsView *view;

@@ -7,6 +7,7 @@ Building::Building(QPixmap *image, Game *game, Xy coord) : GraphicsPixmapItem(im
     this->game = game;
     setting = new Setting(game, coord, *game->get_size_setting_building());
     setting->add_button(new PushButton(game, {coord.x+330, coord.y+160}, *game->get_img_size("been"), &Game::sold_building, "been", game->get_img("been")));
+    setting->add_button(new PushButton(game, {coord.x+260, coord.y+160}, *game->get_img_size("lvl_up"), &Game::lvl_up, "lvl_up", game->get_img("lvl_up")));
     this->add_img();
 }
 
@@ -14,6 +15,7 @@ Building::~Building(){
     if(setting_union != nullptr){
         delete setting_union;
     }
+    delete setting;
 }
 
 int Building::get_nb_worker(){
@@ -42,9 +44,7 @@ Xy Building::get_size(){
     return get_img_size();
 }
 
-float Building::get_efficiency(){
-    return value_per_worker*nb_worker;
-}
+
 
 void Building::clicked(){
     game->set_current_setting(setting, setting_union);
@@ -52,4 +52,10 @@ void Building::clicked(){
 
 Xy *Building::get_current_pos(){
     return get_pos();
+}
+
+void Building::sold(){
+    game->increase_gold(get_value_for_sold());
+    game->kik_workers(nb_worker);
+    delete this;
 }

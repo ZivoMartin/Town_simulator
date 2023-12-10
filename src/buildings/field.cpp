@@ -2,9 +2,11 @@
 #include "../Game.h"
 
 int Field::max_worker[4] = {6, 8, 10, 12};
+float Field::value_per_worker[4] = {0.3, 0.4, 0.5, 0.6};
+int Field::price_to_up[3] = {120, 150, 200};
+int Field::value_for_sold[4] = {100, 120, 150, 200};
 
 Field::Field(Game *game, Xy coord) : Building(game->get_img("field"), game, coord){
-    value_per_worker = 0.3;
     setting_union = new build_tab_case;
     setting_union->type = FIELD;
     setting_union->building.field = this;
@@ -45,4 +47,12 @@ bool Field::pull_worker(){
         return true;
     }
     return false;
+}
+
+float Field::get_efficiency(){
+    return nb_worker*value_per_worker[lvl];
+}
+
+int Field::get_value_for_sold(){
+    return value_for_sold[lvl];
 }

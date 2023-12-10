@@ -1,4 +1,6 @@
-#include "src/application/Application.h"
+#include <QApplication>
+#include "src/Game.h"
+
 
 int main(int argc, char *argv[])
 {

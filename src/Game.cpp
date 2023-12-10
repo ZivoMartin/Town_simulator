@@ -146,8 +146,7 @@ QColor Game::get_color(std::string color){
 }
 
 void Game::update_info(){
-    current_stat["gold"] += top_info["gold_ratio"]->get_value();
-    top_info["nb_gold"]->set_value(static_cast<int>(current_stat["gold"]));
+    increase_gold(top_info["gold_ratio"]->get_value());
     float new_food = current_stat["food"]+top_info["food_ratio"]->get_value();
     if(new_food > 0){
         current_stat["food"] = new_food;
@@ -210,8 +209,7 @@ void Game::click_release(Xy stop_pos){
         if(try_to_buy == HOUSE) str = "house";
 
         if(create_new_building(str, stop_pos)){
-            current_stat["gold"] -= building_price[str] - price_to_add;
-            top_info["nb_gold"]->set_value(static_cast<int>(current_stat["gold"]));
+            increase_gold(-(building_price[str] - price_to_add));
         }
 
         try_to_buy = EMPTY;
@@ -263,7 +261,7 @@ bool Game::is_dragging(){
     return dragging.dragging;
 }
 void Game::load_images(){
-    std::string t[] = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been"};
+    std::string t[] = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up"};
 
     dim_img_map["field"] = {FIELD_WIDTH, FIELD_HEIGHT};
     dim_img_map["house"] = {HOUSE_WIDTH, HOUSE_HEIGHT};
@@ -273,8 +271,9 @@ void Game::load_images(){
     dim_img_map["less"] = {30, 30};
     dim_img_map["shop_icon"] = {120, 120};
     dim_img_map["been"] = {30, 30};
+    dim_img_map["lvl_up"] = {40, 30};
 
-    for(int i=0; i<8; i++){ 
+    for(int i=0; i<9    ; i++){ 
         images_map[t[i]] = new QPixmap();
         images_map[t[i]]->load(QString::fromStdString("../images/"+ t[i] + ".png"));
         *images_map[t[i]] = images_map[t[i]]->scaled(dim_img_map[t[i]].x, dim_img_map[t[i]].y);
@@ -559,8 +558,47 @@ int Game::get_max_citizen(){
     return max_citizen;
 }
 
+template <typename T>
+void Game::remove_elt(std::vector<T> *vec, T elt){
+    for(unsigned int i=0; i<vec->size(); i++){
+        if((*vec)[i] == elt){
+            vec->erase(vec->begin() + i);
+            break;
+        }
+    }
+}
+
+
 void Game::sold_building(){
-    printf("Sold\n");
+    if(current_open_setting.building->type == FIELD){
+        remove_elt(&field_vec, current_open_setting.building->building.field);
+    }else if(current_open_setting.building->type == SHOP){
+        remove_elt(&shop_vec, current_open_setting.building->building.shop);
+    }else{
+        remove_elt(&house_vec, current_open_setting.building->building.house);
+    }
+    apply_method_0(current_open_setting.building, &Building::sold);
+    current_open_setting = {nullptr, nullptr};
+}
+
+void Game::increase_gold(int x){
+    current_stat["gold"] += x;
+    top_info["nb_gold"]->set_value(static_cast<int>(current_stat["gold"]));
+}
+
+void Game::kik_workers(int x){
+    nb_worker -= x;
+    nb_unemployed += x;
+    top_info["nb_worker"]->set_value(nb_worker);
+    top_info["nb_non_worker"]->set_value(nb_unemployed);
+}
+
+void Game::lvl_up(){
+    if(current_stat["gold"] >= building_price["shop"]){
+        try_to_buy = SHOP;
+        try_to_buy_img = new GraphicsPixmapItem(get_img("shop"), view->get_scene(), shop_img_pos["shop"]);
+        try_to_buy_img->add_img();
+    }
 }
 
 template <typename K, typename V>

@@ -2,10 +2,12 @@
 #include "../Game.h"
 
 int Shop::max_worker[4] = {6, 8, 10, 12};
+float Shop::value_per_worker[4] = {0.3, 0.3, 0.4, 0.5};
+int Shop::price_to_up[3] = {100, 200, 300};
+int Shop::value_for_sold[4] = {100, 120, 150, 200};
 
 
 Shop::Shop(Game *game, Xy coord) : Building(game->get_img("shop"), game, coord){
-    value_per_worker = 0.3;
     setting_union = new build_tab_case;
     setting_union->type = SHOP;
     setting_union->building.shop = this;
@@ -19,7 +21,7 @@ Shop::Shop(Game *game, Xy coord) : Building(game->get_img("shop"), game, coord){
     setting->add_img(new GraphicsPixmapItem(game->get_img("shop"), game->get_view()->get_scene(), {coord.x+306, coord.y+100}));
     setting->get_info_zone("nb_worker")->set_value(0.0);
     setting->get_info_zone("nb_max_worker")->set_value(static_cast<float>(max_worker[0]));
-    setting->get_info_zone("lvl")->set_value(0.0);
+    setting->get_info_zone("lvl")->set_value(1.0);
 }
 Shop::~Shop(){}
 
@@ -42,4 +44,12 @@ bool Shop::pull_worker(){
         return true;
     }
     return false;
+}
+
+float Shop::get_efficiency(){
+    return nb_worker*value_per_worker[lvl];
+}
+
+int Shop::get_value_for_sold(){
+    return value_for_sold[lvl];
 }

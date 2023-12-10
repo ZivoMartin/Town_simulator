@@ -19,19 +19,24 @@ public:
     void drag(Xy new_pos);
     Xy get_size();
     void set_origin_pos(Xy new_pos);
-    float get_efficiency();
     virtual void clicked();
+    virtual float get_efficiency() = 0;
     virtual bool add_worker() = 0;
     virtual bool pull_worker() = 0;
+    virtual int get_value_for_sold() = 0;
+    void sold();
 
 protected:
     Game *game;
     int nb_worker = 0;
-    float value_per_worker = 0;
     int lvl = 0;
     Xy origin_pos;
     Setting *setting;
     build_tab_case *setting_union;
+
+    int value_for_sold[];
+
+
 };
 
 #endif
