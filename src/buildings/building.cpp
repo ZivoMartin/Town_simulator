@@ -14,14 +14,17 @@ Building::~Building(){
         delete setting_union;
     }
     delete setting;
+    Xy s = get_size();
+    game->erase_zone(&origin_pos, &s);
+
 }
 
 void Building::init_setting(Xy coord){
     setting = new Setting(game, coord, *game->get_size_setting_building());
-    setting->add_button(new PushButton(game, {coord.x+330, coord.y+160}, *game->get_img_size("been"), &Game::sold_building, "been", game->get_img("been")));
-    setting->add_button(new PushButton(game, {coord.x+260, coord.y+160}, *game->get_img_size("lvl_up"), &Game::lvl_up, "lvl_up", game->get_img("lvl_up")));
-    setting->add_info_zone(new InfoZone(game, {coord.x+260, coord.y+190}, {30, 30}, "$", game->get_color("upgrade_price"), RECT, "upgrade_price"));
-    setting->add_info_zone(new InfoZone(game, {coord.x+330, coord.y+190}, {30, 30}, "$", game->get_color("sold_price"), RECT, "sold_price"));
+    setting->add_button(new PushButton(game, {coord.x+320, coord.y+160}, *game->get_img_size("been"), &Game::sold_building, "been", game->get_img("been")));
+    setting->add_button(new PushButton(game, {coord.x+255, coord.y+160}, *game->get_img_size("lvl_up"), &Game::lvl_up, "lvl_up", game->get_img("lvl_up")));
+    setting->add_info_zone(new InfoZone(game, {coord.x+255, coord.y+190}, {40, 30}, "$", game->get_color("upgrade_price"), RECT, "upgrade_price"));
+    setting->add_info_zone(new InfoZone(game, {coord.x+320, coord.y+190}, {40, 30}, "$", game->get_color("sold_price"), RECT, "sold_price"));
     setting->add_info_zone(new InfoZone(game, {coord.x+245, coord.y+10}, {120, 30}, "", game->get_color("lvl_info"), RECT, "lvl"));
     setting->get_info_zone("lvl")->set_value(1);
     setting->get_info_zone("upgrade_price")->decal_txt({-10, 0});
@@ -35,6 +38,8 @@ int Building::get_nb_worker(){
 void Building::lvl_up(){
     lvl += 1;
     setting->get_info_zone("lvl")->set_value(lvl+1);
+    setting->get_info_zone("upgrade_price")->set_value(price_to_up[lvl]);
+    setting->get_info_zone("nb_max_worker")->set_value(max_worker[lvl]);
 }
 
 int Building::get_level(){

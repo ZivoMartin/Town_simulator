@@ -18,9 +18,8 @@
 #include "buildings/shop.h"
 #include "buildings/house.h"
 #include "info_zone/info_zone.h"
-#include "settings_building/settings.h"
 #include "common_functions/common_functions.h"
-
+#include "menu/menu.h"
 
 #define CASE_SIZE 15
 #define FIELD_WIDTH 105
@@ -91,13 +90,21 @@ public:
     void set_max_citizen(int x);
     int get_max_citizen();
     void sold_building();
-    void increase_gold(int x);
+    void increase_gold(float x);
     void kik_workers(int x);
     void lvl_up();
+    void end_game();
+    void reset();
+    void clean_building();
+    void build_shop();
+    void init_info_bubble();
+    void start();
+    void start_signal();
+    Xy *get_screen_size();
     
 private:
     GraphicsView *view;
-    unsigned int iter = 0;
+    unsigned int iter;
     
     std::map<std::string, QPixmap*> images_map;
     std::map<std::string, Xy> dim_img_map;
@@ -125,12 +132,16 @@ private:
     QGraphicsPixmapItem *bg_img;
     type_building try_to_buy = EMPTY;
     GraphicsPixmapItem *try_to_buy_img = nullptr;
+    Menu *menu;
+    PushButton *shop_button;
 
     int price_to_add = 25;
-    int nb_citizen = BASE_CITIZEN;
-    int nb_worker = 0;
-    int nb_unemployed = BASE_CITIZEN;
-    int max_citizen = 0;
+    int nb_citizen;
+    int nb_worker;
+    int nb_unemployed;
+    int max_citizen;
+    int surpopulation;
+    int gold_limit;
 
     float factor_citizen_ratio = 800;
 };

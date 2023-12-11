@@ -2,18 +2,18 @@
 #include "../Game.h"
 
 InfoZone::InfoZone(Game *game, Xy pos, Xy size, QString txt, QColor color, form_type type_bg, std::string name) : QGraphicsTextItem(txt){
-    position = pos;
+    this->bg_position = pos;
     size = size;
     scene = game->get_view()->get_scene();
     this->game = game;
     base_text = txt;
     bg = new GraphicBg(type_bg, pos, size, color, scene);
     if(type_bg == CIRCLE){
-        position = {pos.x+10, static_cast<int>(pos.y+size.y/3.6)}; 
+        this->text_position = {pos.x+10, static_cast<int>(pos.y+size.y/3.6)}; 
     }else{
-        position = {pos.x+10, pos.y}; 
+        this->text_position = {pos.x+10, pos.y}; 
     }
-    this->setPos(position.x, position.y); 
+    this->setPos(text_position.x, text_position.y); 
     this->setDefaultTextColor(QColor(0, 0, 0));
     this->name = name;
 }
@@ -49,13 +49,14 @@ void InfoZone::remove(){
 }
 
 void InfoZone::set_pos(Xy pos){
-    this->position = pos;
     if(bg->get_type() == CIRCLE){
-        this->setPos(pos.x+10, pos.y+size.y/3.6); 
+        this->text_position = {pos.x+10, static_cast<int>(pos.y+size.y/3.6)}; 
     }else{
-        this->setPos(pos.x+10, pos.y); 
+        this->text_position = {pos.x+10, pos.y}; 
     }
+    this->setPos(text_position.x, text_position.y);
     bg->set_pos(pos); 
+    decal_txt(decal);
 }
 
 std::string InfoZone::get_name(){
@@ -63,10 +64,10 @@ std::string InfoZone::get_name(){
 }
 
 Xy InfoZone::get_pos(){
-    return position;
+    return bg_position;
 }
 
 void InfoZone::decal_txt(Xy decal){
-    position = {position.x + decal.x, position.y + position.y};
-    this->setPos(position.x, position.y);
+    this->decal = decal;
+    this->setPos(text_position.x + decal.x, text_position.y+decal.y);
 }

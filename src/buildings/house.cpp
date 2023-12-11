@@ -22,7 +22,7 @@ bool House::add_worker(){
         return true;
     }
     return false;
-    }
+}
 
 bool House::pull_worker(){
     if(nb_worker>0){

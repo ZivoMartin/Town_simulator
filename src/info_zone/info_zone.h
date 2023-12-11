@@ -24,8 +24,10 @@ public:
     void decal_txt(Xy decal);
 
 private:
-    Xy position;
+    Xy text_position;
+    Xy bg_position;
     Xy size;
+    Xy decal = {0, 0};
     float value = 0.0;
     QString base_text;
     Game *game;

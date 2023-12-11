@@ -18,9 +18,9 @@ Setting::~Setting(){
     }
     delete brush;
     delete close_button;
-    free_map(button_map);
-    free_map(infozone_map);
-    free_vec(static_img_vec);
+    free_map(&button_map);
+    free_map(&infozone_map);
+    free_vec(&static_img_vec);
 }
 
 void Setting::close(){
@@ -109,16 +109,22 @@ void Setting::erase_img(GraphicsPixmapItem *img){
 }
 
 template <typename K, typename V>
-void free_map(std::map<K, V> map){
-    for(auto el: map){
-        delete map[el.first];
+void free_map(std::map<K, V> *map){
+    std::vector<K> s;
+    for(auto el: (*map)){
+        delete (*map)[el.first];
+        s.push_back(el.first);
+    }
+    for(unsigned int i = 0; i<s.size(); i++){
+        map->erase(s[i]);
     }
 }
 
 template <typename T>
-void free_vec(std::vector<T> vec){
-    for(unsigned int i=0; i<vec.size(); i++){
-        delete vec[i];
+void free_vec(std::vector<T> *vec){
+    while(vec->size() != 0){
+        delete (*vec)[0];  
+        vec->erase(vec->begin());
     }
 }
 

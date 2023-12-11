@@ -26,7 +26,8 @@ HEADERS += src/Game.h \
            src/settings_building/settings.h \
            src/view/GraphicsView.h \
            src/info_zone/graphic_bg.h \
-           src/common_functions/common_functions.h
+           src/common_functions/common_functions.h \
+           src/menu/menu.h
 SOURCES += main.cpp \
            src/Game.cpp \
            src/buildings/building.cpp \
@@ -39,6 +40,7 @@ SOURCES += main.cpp \
            src/settings_building/settings.cpp \
            src/view/GraphicsView.cpp \
            src/info_zone/graphic_bg.cpp \
-           src/common_functions/common_functions.cpp
+           src/common_functions/common_functions.cpp \
+           src/menu/menu.cpp
 
 QT += widgets

@@ -1,25 +1,36 @@
 #include "Game.h"
 
 Game::Game(GraphicsView *view): QMainWindow(){
-    dragging.dragging = false;
+    view->showFullScreen();
+    view->show();
     view->set_game(this);
     this->view = view;
     load_images();
     load_colors();
     setup_scene();
     build_info_bubble();
+    build_shop();
+    menu = new Menu(this);
+}
+
+
+void Game::start(){
+    iter = 0;
+    dragging.dragging = false;
+    init_info_bubble();
+    shop_button->add();
     init_game();
     play();
 }
 
-
+void Game::start_signal(){
+    menu->start_game();
+}
 
 Game::~Game(){
-    free_vec<Field*>(field_vec);
-    free_vec<Shop*>(shop_vec);
-    free_vec<House*>(house_vec);
-    free_map(images_map);
-    free_map(top_info);
+    clean_building();
+    free_map(&images_map);
+    free_map(&top_info);
 
     if(try_to_buy != EMPTY){
         delete try_to_buy_img;
@@ -27,11 +38,32 @@ Game::~Game(){
 
     delete shop_menu_setting;
     delete background_color;
+    delete menu;
     delete view;
 }
 
+void Game::clean_building(){
+    free_vec<Field*>(&field_vec);
+    free_vec<Shop*>(&shop_vec);
+    free_vec<House*>(&house_vec);
+}
+
+void Game::reset(){
+    clean_building();
+    for(auto el: top_info){
+        top_info[el.first]->remove();
+    }
+    shop_button->remove();
+}
 
 void Game::init_game(){
+    dragging.dragging = false;
+    nb_citizen = BASE_CITIZEN;
+    nb_worker = 0;
+    nb_unemployed = BASE_CITIZEN;
+    max_citizen = 0;
+    gold_limit = -100;
+
     current_stat["gold"] = BASE_GOLD;
     current_stat["food"] = BASE_FOOD;
     current_stat["citizen"] = BASE_CITIZEN;
@@ -39,13 +71,19 @@ void Game::init_game(){
     building_price["shop"] = 50;
     building_price["house"] = 25;
     building_price["field"] = 50;
-    
+
+    create_new_building("field", {34*CASE_SIZE, 30*CASE_SIZE});
+    create_new_building("shop", {38*CASE_SIZE, 22*CASE_SIZE});
+    create_new_building("house", {28*CASE_SIZE, 19*CASE_SIZE});
+    create_new_building("house", {35*CASE_SIZE, 15*CASE_SIZE});
+}
+
+void Game::build_shop(){
     Xy pos = {screen_size.x-shop_setting_size.x, screen_size.y-shop_setting_size.y};
 
     shop_img_pos["field"] = {pos.x+200, pos.y+120};
     shop_img_pos["house"] = {pos.x+400, pos.y+120};
     shop_img_pos["shop"] = {pos.x+600, pos.y+120};
-
     shop_menu_setting = new Setting(this, pos, shop_setting_size);
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["field"], *get_img_size("field"), &Game::try_to_buy_field, "buy_field", get_img("field")));
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["house"], *get_img_size("house"), &Game::try_to_buy_house, "buy_house", get_img("house")));
@@ -56,15 +94,8 @@ void Game::init_game(){
     shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+630, pos.y+120+SHOP_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "shop"));
 
     Xy *s_shop_button = get_img_size("shop_icon");
-    PushButton *shop_button = new PushButton(this, {screen_size.x-s_shop_button->x, screen_size.y-s_shop_button->y}, *s_shop_button, &Game::open_shop, "open_shop", get_img("shop_icon"));
+    this->shop_button = new PushButton(this, {screen_size.x-s_shop_button->x, screen_size.y-s_shop_button->y}, *s_shop_button, &Game::open_shop, "open_shop", get_img("shop_icon"));
     add_button(shop_button);
-    shop_button->add();
-    create_new_building("field", {34*CASE_SIZE, 30*CASE_SIZE});
-    create_new_building("shop", {38*CASE_SIZE, 22*CASE_SIZE});
-    create_new_building("house", {28*CASE_SIZE, 19*CASE_SIZE});
-    create_new_building("house", {35*CASE_SIZE, 15*CASE_SIZE});
-    
-
 }
 
 void Game::play(){
@@ -74,7 +105,9 @@ void Game::play(){
             update_info();    
         }
         view->update();
-        play();
+        if(!menu->get_activity()){
+            play();
+        }
     });
 }
 
@@ -102,7 +135,9 @@ void Game::build_info_bubble(){
     top_info["gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE, "gold_ratio");
     top_info["food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "food_ratio");
     top_info["citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], CIRCLE, "nb_citizen_ratio");
-    
+}
+
+void Game::init_info_bubble(){
     top_info["nb_gold"]->set_value(BASE_GOLD);
     top_info["nb_food"]->set_value(BASE_FOOD);
     top_info["nb_citizen"]->set_value(BASE_CITIZEN);
@@ -116,6 +151,7 @@ void Game::build_info_bubble(){
         top_info[elt.first]->add();
     }
 }
+
 
 void Game::open_shop(){
     if(current_open_setting.setting != nullptr){
@@ -156,9 +192,10 @@ void Game::update_info(){
     }else{
         current_stat["citizen"] -= 1;
         top_info["nb_citizen"]->set_value(static_cast<int>(current_stat["citizen"]));
+        nb_citizen -= 1;
     }
     current_stat["citizen"] += top_info["citizen_ratio"]->get_value();
-    int new_citizen_nb = current_stat["citizen"];
+    int new_citizen_nb = current_stat["citizen"] + top_info["citizen_ratio"]->get_value();
     int display_citizen_nb = top_info["nb_citizen"]->get_value();
     if(new_citizen_nb > display_citizen_nb){
         if(new_citizen_nb <= max_citizen){
@@ -168,12 +205,17 @@ void Game::update_info(){
             nb_citizen = new_citizen_nb;
             nb_unemployed += (new_citizen_nb-display_citizen_nb);
             update_food_ratio();
+        }else{
+            current_stat["citizen"] -= top_info["citizen_ratio"]->get_value();
         }
+    }
+    if(nb_citizen <= 0 || nb_citizen > surpopulation){
+        end_game();
     }
 }
 
 void Game::click_release(Xy stop_pos){
-    if(is_dragging()){
+    if(!menu->get_activity() && is_dragging()){
         Xy *origin_pos = apply_method_0(&dragging.item, &Building::get_origin_pos);
         Xy *current_pos = apply_method_0(&dragging.item, &Building::get_current_pos);
         if(origin_pos->x != current_pos->x || origin_pos->y != current_pos->y){
@@ -204,7 +246,7 @@ void Game::click_release(Xy stop_pos){
             }
         }
         dragging.dragging = false;
-    }else if(try_to_buy != EMPTY){
+    }else if(!menu->get_activity() && try_to_buy != EMPTY){
         delete try_to_buy_img;
         std::string str = "shop"; 
         if(try_to_buy == FIELD) str = "field";
@@ -272,7 +314,7 @@ void Game::load_images(){
     dim_img_map["more"] = {30, 30};
     dim_img_map["less"] = {30, 30};
     dim_img_map["shop_icon"] = {120, 120};
-    dim_img_map["been"] = {30, 30};
+    dim_img_map["been"] = {40, 30};
     dim_img_map["lvl_up"] = {40, 30};
 
     for(int i=0; i<9    ; i++){ 
@@ -554,6 +596,7 @@ void Game::try_to_buy_field(){
 
 void Game::set_max_citizen(int x){
     max_citizen = x;
+    surpopulation = max_citizen * 1.2;
 }
 
 int Game::get_max_citizen(){
@@ -583,9 +626,12 @@ void Game::sold_building(){
     current_open_setting = {nullptr, nullptr};
 }
 
-void Game::increase_gold(int x){
+void Game::increase_gold(float x){
     current_stat["gold"] += x;
     top_info["nb_gold"]->set_value(static_cast<int>(current_stat["gold"]));
+    if(current_stat["gold"] < gold_limit){
+        end_game();
+    }
 }
 
 void Game::kik_workers(int x){
@@ -605,16 +651,30 @@ void Game::lvl_up(){
     }
 }
 
+void Game::end_game(){
+    menu->return_to_menu();
+}
+
+Xy *Game::get_screen_size(){
+    return &screen_size; 
+}
+
 template <typename K, typename V>
-void free_map(std::map<K, V> map){
-    for(auto el: map){
-        delete map[el.first];
+void free_map(std::map<K, V> *map){
+    std::vector<K> s;
+    for(auto el: (*map)){
+        delete (*map)[el.first];
+        s.push_back(el.first);
+    }
+    for(unsigned int i = 0; i<s.size(); i++){
+        map->erase(s[i]);
     }
 }
 
 template <typename T>
-void free_vec(std::vector<T> vec){
-    for(unsigned int i=0; i<vec.size(); i++){
-        delete vec[i];  
+void free_vec(std::vector<T> *vec){
+    while(vec->size() != 0){
+        delete (*vec)[0];  
+        vec->erase(vec->begin());
     }
 }
