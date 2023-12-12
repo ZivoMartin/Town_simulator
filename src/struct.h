@@ -40,7 +40,8 @@ struct drag{
 
 enum form_type{
     RECT,
-    CIRCLE
+    CIRCLE,
+    WITHOUT
 };
 
 union form{

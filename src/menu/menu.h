@@ -15,11 +15,13 @@ public:
     void wait();
     void start_game();
     bool get_activity();
+    void change_menu_info(QString lost_type);
 
 private:
     Game *game;
     bool game_is_starting = false;
     PushButton *start_game_button;
+    InfoZone *menu_info;
 
 };
 

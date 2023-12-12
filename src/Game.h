@@ -18,7 +18,6 @@
 #include "buildings/shop.h"
 #include "buildings/house.h"
 #include "info_zone/info_zone.h"
-#include "common_functions/common_functions.h"
 #include "menu/menu.h"
 
 #define CASE_SIZE 15
@@ -29,7 +28,7 @@
 #define HOUSE_WIDTH 105
 #define HOUSE_HEIGHT 105
 #define FRAME_SPEED 20
-#define BASE_CITIZEN 10
+#define BASE_CITIZEN 14
 #define BASE_FOOD 100
 #define BASE_GOLD 100
 
@@ -93,13 +92,16 @@ public:
     void increase_gold(float x);
     void kik_workers(int x);
     void lvl_up();
-    void end_game();
+    void end_game(QString lost_type);
     void reset();
     void clean_building();
     void build_shop();
     void init_info_bubble();
     void start();
     void start_signal();
+    void reverse_current_setting();
+    void open_rules();
+    void close_rules();
     Xy *get_screen_size();
     
 private:
@@ -134,6 +136,9 @@ private:
     GraphicsPixmapItem *try_to_buy_img = nullptr;
     Menu *menu;
     PushButton *shop_button;
+    InfoZone *rules;
+    PushButton *open_rules_button;
+    bool pause = false;
 
     int price_to_add = 25;
     int nb_citizen;
@@ -144,6 +149,8 @@ private:
     int gold_limit;
 
     float factor_citizen_ratio = 800;
+
+    QString rules_txt = "Principe du jeu:\nC'est une simulation de gestion de ville, le joueur à trois choses à gérer, l'argent qui lui permet de construire, la nourriture qui lui permet de \ngarder ses habitants en vie, et le nombre d'habitant. Le joueur a donc trois indices, nourriture gagnée par seconde, nombre d'habitants en plus par seconde,\net argent gagnée par seconde.\n\nIl éxiste 3 catégories de batiments:\n    -Le champs: Il permet d'augmenter la nourriture gagnée par seconde, s'il n'y a plus de nourriture un habitant meurt par seconde.\n  -La superette: Elle permet de générer de l'argent. Si l'argent dépasse une certaine valeur négative (-100), la partie est finie.\n  -Les maison: Elles permettent de loger les habitants. En fonction du nombre maximum d'habitant pouvant peupler la ville, une valeur de surpopulation\n  superieur à celle d'habitant maximum est donnée, si cette valeur est depassée, la partie est perdue.\n  Il est donc autorisé de depasser la limite mais le temps sera alors compté avant la défaite, c'est une sorte d'avertissement.\n\nDans chaque batiment il peut il y a voir un nombre maximum de personne qui y travaille, chaque habitant en plus dans le batiment augmente les ressources\nque ce batiment génère par seconde. Chaque batiment peut etre amelioré pour augmenter sa capacitée à accueilir des habitants ainsi que le rendement d'un habitant \ndans le batiment. Pour les maisons ca augmente simplement le nombre d'habitant logable à l'interieur. Pus il y a d'habitant, plus les besoins en nourriture \naugmentent, plus il y à de bâtiments plus le ratio en gold par seconde baisse.\n\nLe but du jeu est donc d'avoir le plus d'habitant possible.";
 };
 
 #endif

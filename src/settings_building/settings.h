@@ -12,12 +12,11 @@
 #include "../struct.h"
 #include "../button/button.h"
 #include "../info_zone/info_zone.h"
-#include "../common_functions/common_functions.h"
 
 class Setting: public QGraphicsRectItem{
 
 public:    
-    Setting(Game *game, Xy pos, Xy size);
+    Setting(Game *game, Xy pos, Xy size, Setting *reverse);
     ~Setting();
     void open();
     void close();
@@ -31,9 +30,14 @@ public:
     InfoZone *get_info_zone(std::string name);
     PushButton *get_button(std::string name);
     bool get_is_open();
+    Setting *get_reverse();
+    void set_reverse_button();
+    Setting *reverse();
+    void switch_have_to_delete_reverse();
 
 private:
     PushButton *close_button;
+    PushButton *reverse_button;
     Xy size;
     Game *game;
     QBrush *brush;
@@ -43,6 +47,9 @@ private:
     std::map<std::string, InfoZone*> infozone_map;
     std::vector<GraphicsPixmapItem*> static_img_vec;
     bool is_open = false;
+    bool reversed = false;
+    Setting *reverse_setting;
+    bool have_to_delete_reverse = true;
 };
 
 #endif

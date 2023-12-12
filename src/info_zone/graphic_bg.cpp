@@ -8,7 +8,7 @@ GraphicBg::GraphicBg(form_type type, Xy pos, Xy size, QColor color, QGraphicsSce
         bg_union.bg.rect = new QGraphicsRectItem(0, 0, size.x, size.y);
         bg_union.bg.rect->setPos(pos.x, pos.y);
         bg_union.bg.rect->setBrush(*brush);
-    }else{
+    }else if(type == CIRCLE){
         bg_union.bg.circle = new QGraphicsEllipseItem(0, 0, size.x, size.y);
         bg_union.bg.circle->setPos(pos.x, pos.y);
         bg_union.bg.circle->setBrush(*brush);
@@ -20,7 +20,7 @@ GraphicBg::GraphicBg(form_type type, Xy pos, Xy size, QColor color, QGraphicsSce
 GraphicBg::~GraphicBg(){
     if(bg_union.type == RECT){
         delete bg_union.bg.rect;
-    }else{
+    }else if(bg_union.type == CIRCLE){
         delete bg_union.bg.circle;
     }
     delete brush;
@@ -29,7 +29,7 @@ GraphicBg::~GraphicBg(){
 void GraphicBg::add(){
     if(bg_union.type == RECT){
         scene->addItem(bg_union.bg.rect);
-    }else{
+    }else if(bg_union.type == CIRCLE){
         scene->addItem(bg_union.bg.circle);
     }
 }
@@ -37,7 +37,7 @@ void GraphicBg::add(){
 void GraphicBg::remove(){
     if(bg_union.type == RECT){
         scene->removeItem(bg_union.bg.rect);
-    }else{
+    }else if(bg_union.type == CIRCLE){
         scene->removeItem(bg_union.bg.circle);
     }
 }
@@ -46,7 +46,7 @@ void GraphicBg::set_pos(Xy pos){
     this->pos = pos;
     if(bg_union.type == RECT){
         bg_union.bg.rect->setPos(pos.x, pos.y);
-    }else{
+    }else if(bg_union.type == CIRCLE){
         bg_union.bg.circle->setPos(pos.x, pos.y);
     } 
 }

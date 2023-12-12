@@ -84,7 +84,7 @@ void Game::build_shop(){
     shop_img_pos["field"] = {pos.x+200, pos.y+120};
     shop_img_pos["house"] = {pos.x+400, pos.y+120};
     shop_img_pos["shop"] = {pos.x+600, pos.y+120};
-    shop_menu_setting = new Setting(this, pos, shop_setting_size);
+    shop_menu_setting = new Setting(this, pos, shop_setting_size, nullptr);
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["field"], *get_img_size("field"), &Game::try_to_buy_field, "buy_field", get_img("field")));
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["house"], *get_img_size("house"), &Game::try_to_buy_house, "buy_house", get_img("house")));
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["shop"], *get_img_size("shop"), &Game::try_to_buy_shop, "buy_shop", get_img("shop")));
@@ -101,7 +101,7 @@ void Game::build_shop(){
 void Game::play(){
     QTimer::singleShot(FRAME_SPEED, this, [=](){
         iter += 1;
-        if(iter%10 == 0){
+        if(iter%10 == 0 && !pause){
             update_info();    
         }
         view->update();
@@ -135,6 +135,8 @@ void Game::build_info_bubble(){
     top_info["gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE, "gold_ratio");
     top_info["food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "food_ratio");
     top_info["citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 200, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], CIRCLE, "nb_citizen_ratio");
+    top_info["nb_citizen"]->add_son(new InfoZone(this, {58, 38}, {0, 0}, "Max: ", QColor(255, 255, 255), WITHOUT, "max_citizen"));
+    top_info["nb_citizen"]->set_value_of_a_son(max_citizen, "max_citizen");
 }
 
 void Game::init_info_bubble(){
@@ -193,24 +195,31 @@ void Game::update_info(){
         current_stat["citizen"] -= 1;
         top_info["nb_citizen"]->set_value(static_cast<int>(current_stat["citizen"]));
         nb_citizen -= 1;
+        if(nb_citizen <= max_citizen){
+            top_info["nb_citizen"]->set_text_color(QColor(0, 0, 0));
+        }
     }
     current_stat["citizen"] += top_info["citizen_ratio"]->get_value();
     int new_citizen_nb = current_stat["citizen"] + top_info["citizen_ratio"]->get_value();
     int display_citizen_nb = top_info["nb_citizen"]->get_value();
     if(new_citizen_nb > display_citizen_nb){
-        if(new_citizen_nb <= max_citizen){
-            top_info["citizen_ratio"]->set_value(new_citizen_nb/factor_citizen_ratio);
-            top_info["nb_citizen"]->set_value(new_citizen_nb);
-            top_info["nb_non_worker"]->set_value(top_info["nb_non_worker"]->get_value() + (new_citizen_nb-display_citizen_nb));
-            nb_citizen = new_citizen_nb;
-            nb_unemployed += (new_citizen_nb-display_citizen_nb);
-            update_food_ratio();
-        }else{
-            current_stat["citizen"] -= top_info["citizen_ratio"]->get_value();
+        if(new_citizen_nb > max_citizen){
+            top_info["nb_citizen"]->set_text_color(Qt::red);
+            if(new_citizen_nb >= surpopulation){
+                end_game("You lost because of surpopulation ! Wanna restart ?");
+            }
         }
+        top_info["citizen_ratio"]->set_value(new_citizen_nb/factor_citizen_ratio);
+        top_info["nb_citizen"]->set_value(new_citizen_nb);
+        top_info["nb_non_worker"]->set_value(top_info["nb_non_worker"]->get_value() + (new_citizen_nb-display_citizen_nb));
+        nb_citizen = new_citizen_nb;
+        nb_unemployed += (new_citizen_nb-display_citizen_nb);
+        update_food_ratio();
     }
-    if(nb_citizen <= 0 || nb_citizen > surpopulation){
-        end_game();
+    if(nb_citizen <= 0){
+        end_game("Lost by famine, wanna restart ?");
+    } else if(nb_citizen > surpopulation){
+        end_game("Lost by surpopulation, wanna restart ?");
     }
 }
 
@@ -333,6 +342,9 @@ void Game::setup_scene(){
     this->screen_size = {screen->geometry().width() - 30, screen->geometry().height() - 30};
     map_case_dim = {screen_size.x/CASE_SIZE, screen_size.y/CASE_SIZE};
     view->set_size(screen_size);
+    rules = new InfoZone(this, {-15, -15}, {screen_size.x+30, screen_size.y+30}, rules_txt, QColor(255, 255, 255), RECT, "rules");
+    open_rules_button = new PushButton(this, {screen_size.x - 120, 0}, *get_img_size("shop_icon"), &Game::open_rules, "open_rules", get_img("shop_icon"));
+    open_rules_button->add();
     // bg_img = new QGraphicsPixmapItem(*images_map["bg"]);
     // bg_img->setTransformOriginPoint(images_map["bg"]->rect().center());
     // bg_img->setScale(qreal(view->get_scene()->width()) / qreal(images_map["bg"]->width()), 
@@ -597,6 +609,10 @@ void Game::try_to_buy_field(){
 void Game::set_max_citizen(int x){
     max_citizen = x;
     surpopulation = max_citizen * 1.2;
+    top_info["nb_citizen"]->set_value_of_a_son(x, "max_citizen");
+    if(nb_citizen <= max_citizen){
+        top_info["nb_citizen"]->set_text_color(QColor(0, 0, 0));
+    }
 }
 
 int Game::get_max_citizen(){
@@ -630,7 +646,7 @@ void Game::increase_gold(float x){
     current_stat["gold"] += x;
     top_info["nb_gold"]->set_value(static_cast<int>(current_stat["gold"]));
     if(current_stat["gold"] < gold_limit){
-        end_game();
+        end_game("Lost by economic crisis ! Wanna restart ?");
     }
 }
 
@@ -651,13 +667,29 @@ void Game::lvl_up(){
     }
 }
 
-void Game::end_game(){
+void Game::end_game(QString lost_type){
+    menu->change_menu_info(lost_type);
     menu->return_to_menu();
 }
 
 Xy *Game::get_screen_size(){
     return &screen_size; 
 }
+
+void Game::reverse_current_setting(){
+    current_open_setting.setting = current_open_setting.setting->reverse();
+}
+
+void Game::open_rules(){
+    rules->add();
+    pause = true;
+}
+
+void Game::close_rules(){
+    rules->remove();
+    pause = false;
+}
+
 
 template <typename K, typename V>
 void free_map(std::map<K, V> *map){

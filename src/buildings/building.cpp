@@ -20,7 +20,8 @@ Building::~Building(){
 }
 
 void Building::init_setting(Xy coord){
-    setting = new Setting(game, coord, *game->get_size_setting_building());
+    setting = new Setting(game, coord, *game->get_size_setting_building(), nullptr);
+    setting->set_reverse_button();
     setting->add_button(new PushButton(game, {coord.x+320, coord.y+160}, *game->get_img_size("been"), &Game::sold_building, "been", game->get_img("been")));
     setting->add_button(new PushButton(game, {coord.x+255, coord.y+160}, *game->get_img_size("lvl_up"), &Game::lvl_up, "lvl_up", game->get_img("lvl_up")));
     setting->add_info_zone(new InfoZone(game, {coord.x+255, coord.y+190}, {40, 30}, "$", game->get_color("upgrade_price"), RECT, "upgrade_price"));

@@ -5,6 +5,7 @@
 #include <QGraphicsTextItem>
 #include <QColor>
 #include "graphic_bg.h"
+#include "../common_functions/common_functions.h"
 
 class Game;
 
@@ -22,6 +23,11 @@ public:
     std::string get_name();
     void set_base_text(QString new_base_text);
     void decal_txt(Xy decal);
+    void set_text_color(QColor c);
+    void add_son(InfoZone *new_inf);
+    float get_value_of_a_son(std::string name);
+    void set_base_text_of_a_son(QString new_txt, std::string name);
+    void set_value_of_a_son(float x, std::string name);
 
 private:
     Xy text_position;
@@ -34,6 +40,8 @@ private:
     GraphicBg *bg;
     QGraphicsScene *scene;
     std::string name;
+    std::map<std::string, InfoZone *> son_map; 
+    bool is_open = false;
 };
 
 #endif
