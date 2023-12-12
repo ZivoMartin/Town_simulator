@@ -305,8 +305,7 @@ bool Game::is_dragging(){
     return dragging.dragging;
 }
 void Game::load_images(){
-    std::string t[] = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up"};
-
+    std::vector<std::string> t = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up", "start"};
     dim_img_map["field"] = {FIELD_WIDTH, FIELD_HEIGHT};
     dim_img_map["house"] = {HOUSE_WIDTH, HOUSE_HEIGHT};
     dim_img_map["shop"] = {SHOP_WIDTH, SHOP_HEIGHT};
@@ -316,8 +315,9 @@ void Game::load_images(){
     dim_img_map["shop_icon"] = {120, 120};
     dim_img_map["been"] = {40, 30};
     dim_img_map["lvl_up"] = {40, 30};
+    dim_img_map["start"] = {300, 150};
 
-    for(int i=0; i<9    ; i++){ 
+    for(unsigned int i=0; i<t.size(); i++){ 
         images_map[t[i]] = new QPixmap();
         images_map[t[i]]->load(QString::fromStdString("../images/"+ t[i] + ".png"));
         *images_map[t[i]] = images_map[t[i]]->scaled(dim_img_map[t[i]].x, dim_img_map[t[i]].y);

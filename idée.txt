@@ -1,0 +1,30 @@
+Principe du jeu:
+C'est une simulation de gestion de ville, le joueur à trois choses à gérer, l'argent qui lui permet de construire, la nourriture qui lui permet de 
+garder ses habitants en vie, et le nombre d'habitant. Le joueru a donc trois indices, nourriture gagnée par seconde, nombre d'habitants en plus par seconde,
+et argent gagné par seconde.
+
+Il existe 3 catégories de batiments:
+    -Le champs: Il permet d'augmenter la nourriture gagnée par tours, s'il n'y a plus de nourriture un habitant meur par seconde.
+    -La superette: Elle permet de générer de l'argent. Si l'argent depasse une certaine valeur négative, la partie est finis.
+    -Les maison: Elles permettent de loger les habitants. S'il n'y a plus assez de maison, quelque soit le nombre d'habitant par seconde, plus aucun habitant 
+    n'apparaîtra. Si l'arret de production d'habitant est prolongé, la partie est perdu.
+
+Il existe 2 types d'habitants:
+    -les fermiers: travaillent dans les champs
+    -les commercants: travaillent dans les superettes.
+
+Dans chaque batiment il peut il y a voir un nombre maximum de personne qui y travaille, chaque habitant en plus dans le batiment augmente les ressources
+que ce batiment génère par seconde. Chaque batiment peut etre amelioré pour augmenter sa capacité à accueilir des habitants ainsi que le rendement d'un habitant 
+dans le batiment. Pour les maisons ca augmente simplement le nombre d'habitant logable à l'interieur. Pus il y a d'habitant, plus les besoins en nourriture 
+augmentent.
+
+Le but du jeu est donc d'avoir le plus d'habitant possible.
+
+
+-Rendre le jeu balance
+-Trouver un background
+-Faire un bouton pour lire les regles, in game et depuis le menu (si le bouton est pressé in game alors le jeu se met en pause)
+-avoir un petit bouton en haut à gauche dans les settings des buildings pour avoir accés aux stats avancées
+-Mettre le place le principe de surpopulation
+-Regler la hitbox des buildings
+
