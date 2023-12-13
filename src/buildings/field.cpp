@@ -17,6 +17,8 @@ Field::Field(Game *game, Xy coord) : Building(game->get_img("field"), game, coor
     setting->add_img(new GraphicsPixmapItem(game->get_img("field"), game->get_view()->get_scene(), {coord.x+306, coord.y+100}));
     setting->get_info_zone("nb_worker")->set_value(0.0);
     setting->get_info_zone("lvl")->set_base_text("Field level ");
+    setting->get_reverse()->get_info_zone("header")->set_base_text("Field");
+    init_reverse_for_efficient_building();
     init_common_value();
 }
 

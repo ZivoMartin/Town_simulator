@@ -28,7 +28,7 @@
 #define HOUSE_WIDTH 105
 #define HOUSE_HEIGHT 105
 #define FRAME_SPEED 20
-#define BASE_CITIZEN 14
+#define BASE_CITIZEN 10
 #define BASE_FOOD 100
 #define BASE_GOLD 100
 
@@ -136,7 +136,7 @@ private:
     GraphicsPixmapItem *try_to_buy_img = nullptr;
     Menu *menu;
     PushButton *shop_button;
-    InfoZone *rules;
+    Setting *rules;
     PushButton *open_rules_button;
     bool pause = false;
 

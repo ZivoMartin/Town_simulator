@@ -2,13 +2,13 @@
 #include "../Game.h"
 
 
-PushButton::PushButton(Game *game, Xy pos, Xy size, void (Game::*f)(), std::string name, QPixmap *img) : GraphicsPixmapItem(img, game->get_view()->get_scene(), pos){
+PushButton::PushButton(Game *game, Xy pos, Xy size, void (Game::*f)(), std::string name, QPixmap *img) : GraphicsPixmapItem(img, game->get_view()->get_scene(), {pos.x+size.x/2, pos.y+size.y/2}){
     this->game = game;
     this->scene = game->get_view()->get_scene();
     this->size = size;
     this->name = name;
     this->click = f;
-    set_pos(pos);
+    this->pos = pos;
 }
 
 PushButton::~PushButton(){   
@@ -25,6 +25,9 @@ void PushButton::add(){
 }
 
 bool PushButton::is_it(Xy *coord){
+    if(size.x > 100 || size.y > 100){
+        return coord->x < pos.x+size.x && coord->x+70 > pos.x && coord->y+70 < pos.y+size.y && coord->y+70 > pos.y;    
+    }
     return coord->x < pos.x+size.x && coord->x > pos.x && coord->y < pos.y+size.y && coord->y > pos.y;
 }
 

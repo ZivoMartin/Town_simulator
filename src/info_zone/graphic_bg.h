@@ -17,6 +17,7 @@ public:
     void remove();
     void set_pos(Xy pos);
     form_type get_type();
+    void set_color(QColor color);
 
 private:
     text_info_bg bg_union;

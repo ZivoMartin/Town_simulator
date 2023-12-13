@@ -29,6 +29,8 @@ public:
     void lvl_up();
     void init_common_value();
     void init_setting(Xy coord);
+    void init_reverse_for_efficient_building();
+    void init_reverse_for_house();
 
 protected:
     Game *game;
@@ -37,7 +39,9 @@ protected:
     Xy origin_pos;
     Setting *setting;
     build_tab_case *setting_union;
-
+    int lvl_max = 4;
+    int nb_line;
+    
     std::vector<int> max_worker;
     std::vector<float> value_per_worker;
     std::vector<int> value_for_sold;

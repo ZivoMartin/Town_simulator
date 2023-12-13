@@ -45,7 +45,7 @@ Setting *Setting::reverse(){
 }
 
 void Setting::set_reverse_button(){
-    reverse_button = new PushButton(game, {pos.x + size.x - 30, pos.y}, *game->get_img_size("close_button"), &Game::reverse_current_setting, "reverse_button", game->get_img("close_button"));
+    reverse_button = new PushButton(game, {pos.x + size.x - 30, pos.y}, *game->get_img_size("info"), &Game::reverse_current_setting, "reverse_button", game->get_img("info"));
     if(is_open){
         reverse_button->add();
     }
@@ -60,10 +60,15 @@ void Setting::close(){
     for(auto el: infozone_map){
         infozone_map[el.first]->remove();
     }
+    for(auto el: tab_info_map){
+        tab_info_map[el.first]->remove();
+    }
     for(unsigned int i=0; i<static_img_vec.size(); i++){
         static_img_vec[i]->remove_img();
     }
-    reverse_button->remove();
+    if(reverse_button != nullptr){
+        reverse_button->remove();
+    }
     is_open = false;
 }
 
@@ -76,10 +81,15 @@ void Setting::open(){
     for(auto el: infozone_map){
         infozone_map[el.first]->add();
     }
+    for(auto el: tab_info_map){
+        tab_info_map[el.first]->add();
+    }
     for(unsigned int i=0; i<static_img_vec.size(); i++){
         static_img_vec[i]->add_img();
     }
-    reverse_button->add();
+    if(reverse_button != nullptr){
+        reverse_button->add();
+    }
     is_open = true;
 }
 
@@ -93,6 +103,10 @@ void Setting::set_pos(Xy pos){
         for(auto el: infozone_map){
             Xy w_pos = infozone_map[el.first]->get_pos();
             infozone_map[el.first]->set_pos({pos.x+(w_pos.x - this->pos.x), pos.y+(w_pos.y - this->pos.y)});
+        }
+        for(auto el: tab_info_map){
+            Xy w_pos = tab_info_map[el.first]->get_pos();
+            tab_info_map[el.first]->set_pos({pos.x+(w_pos.x - this->pos.x), pos.y+(w_pos.y - this->pos.y)});
         }
         for(unsigned int i=0; i<static_img_vec.size(); i++){
             Xy *w_pos = static_img_vec[i]->get_pos();
@@ -132,6 +146,14 @@ void Setting::add_img(GraphicsPixmapItem *new_img){
     static_img_vec.push_back(new_img);
 }
 
+void Setting::add_tab_info(TabInfo *new_tab){
+    tab_info_map[new_tab->get_name()] = new_tab;
+}
+
+TabInfo *Setting::get_tab_info(std::string name){
+    return tab_info_map[name];
+}
+
 void Setting::erase_img(GraphicsPixmapItem *img){
     for(unsigned int i=0; i<static_img_vec.size(); i++){
         if(static_img_vec[i] == img){
@@ -139,6 +161,10 @@ void Setting::erase_img(GraphicsPixmapItem *img){
             break;
         }
     }
+}
+
+Xy Setting::get_pos(){
+    return pos;
 }
 
 Setting *Setting::get_reverse(){

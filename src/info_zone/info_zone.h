@@ -28,13 +28,15 @@ public:
     float get_value_of_a_son(std::string name);
     void set_base_text_of_a_son(QString new_txt, std::string name);
     void set_value_of_a_son(float x, std::string name);
+    void set_color(QColor color);
 
 private:
     Xy text_position;
     Xy bg_position;
     Xy size;
     Xy decal = {0, 0};
-    float value = 0.0;
+    float value;
+    bool value_exist = false;
     QString base_text;
     Game *game;
     GraphicBg *bg;

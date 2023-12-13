@@ -10,6 +10,8 @@ House::House(Game *game, Xy coord) : Building(game->get_img("house"), game, coor
     setting->add_img(new GraphicsPixmapItem(game->get_img("house"), game->get_view()->get_scene(), {coord.x+306, coord.y+100}));
     setting->get_info_zone("lvl")->set_base_text("House level ");
     game->set_max_citizen(game->get_max_citizen()+max_worker[0]);
+    setting->get_reverse()->get_info_zone("header")->set_base_text("House");
+    init_reverse_for_house();
     init_common_value();
 }
 

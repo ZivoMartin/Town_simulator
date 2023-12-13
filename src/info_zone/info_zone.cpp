@@ -23,16 +23,25 @@ InfoZone::~InfoZone(){
     free_map(&son_map);
 }
 
+void InfoZone::set_color(QColor color){
+    bg->set_color(color);
+}
+
 float InfoZone::get_value(){
     return value;
 }
 
 void InfoZone::set_base_text(QString new_base_text){
     this->base_text = new_base_text;
-    set_value(value);
+    QString new_display = base_text;
+    if(value_exist){
+        new_display.append(QString::number(value));
+    }
+    this->setPlainText(new_display);
 }
 
 void InfoZone::set_value(float x){
+    value_exist = true;
     value = x;
     QString new_display = base_text;
     new_display.append(QString::number(value));

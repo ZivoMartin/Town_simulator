@@ -26,6 +26,15 @@ GraphicBg::~GraphicBg(){
     delete brush;
 }
 
+void GraphicBg::set_color(QColor color){
+    brush->setColor(color);
+    if(bg_union.type == RECT){
+        bg_union.bg.rect->setBrush(*brush);
+    }else if(bg_union.type == CIRCLE){
+        bg_union.bg.circle->setBrush(*brush);
+    }
+}
+
 void GraphicBg::add(){
     if(bg_union.type == RECT){
         scene->addItem(bg_union.bg.rect);
