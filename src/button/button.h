@@ -23,6 +23,8 @@ public:
     void set_pos(Xy coord);
     std::string get_name();
     Xy get_pos();
+    void set_freezable();
+    bool get_freezable();
 
 private:
     Game *game;
@@ -34,6 +36,7 @@ private:
     QString base_text;
     QGraphicsTextItem *text_item;
     std::string name;
+    bool freezable = false;
 };
 
 #endif

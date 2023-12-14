@@ -18,6 +18,8 @@ Field::Field(Game *game, Xy coord) : Building(game->get_img("field"), game, coor
     setting->get_info_zone("nb_worker")->set_value(0.0);
     setting->get_info_zone("lvl")->set_base_text("Field level ");
     setting->get_reverse()->get_info_zone("header")->set_base_text("Field");
+    setting->get_button("more_worker")->set_freezable();
+    setting->get_button("less_worker")->set_freezable();
     init_reverse_for_efficient_building();
     init_common_value();
 }

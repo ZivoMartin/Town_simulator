@@ -28,6 +28,5 @@ Le but du jeu est donc d'avoir le plus d'habitant possible.
 -Rajouter une templete pour les infozone afin de pouvoir avoir la value que l'on veut.
 -Designner le menu_info.
 -Remplacer tout les getteurs et les setters par des templetes.
--Mettre en place un bouton freez afin de bloquer l'avancée des stats, le mode freez empeche tout achat et amelioration.
 -Mettre une fonction pour regler la taille du text d'une info_zone et regler la taille dans les stats avancées
 -Remplacer le citizen ratio par une barre d'avancement

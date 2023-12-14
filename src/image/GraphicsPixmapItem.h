@@ -18,6 +18,7 @@ public:
     Xy get_img_size();
     void add_img();
     void remove_img();
+    bool is_open();
 
 private:
     QGraphicsScene *scene;

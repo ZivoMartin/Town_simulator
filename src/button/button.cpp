@@ -25,7 +25,7 @@ void PushButton::add(){
 }
 
 bool PushButton::is_it(Xy *coord){
-    if(size.x > 100 || size.y > 100){
+    if(size.x > 106 || size.y > 106){
         return coord->x < pos.x+size.x && coord->x+70 > pos.x && coord->y+70 < pos.y+size.y && coord->y+70 > pos.y;    
     }
     return coord->x < pos.x+size.x && coord->x > pos.x && coord->y < pos.y+size.y && coord->y > pos.y;
@@ -46,4 +46,12 @@ Xy PushButton::get_pos(){
 
 std::string PushButton::get_name(){
     return name;
+}
+
+void PushButton::set_freezable(){
+    freezable = true;
+}
+
+bool PushButton::get_freezable(){
+    return freezable;
 }

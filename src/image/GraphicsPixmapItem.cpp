@@ -35,3 +35,7 @@ void GraphicsPixmapItem::add_img(){
     scene->addItem(this);
     is_display = true;
 }
+
+bool GraphicsPixmapItem::is_open(){
+    return is_display;
+}

@@ -103,6 +103,7 @@ public:
     void open_rules();
     void close_rules();
     Xy *get_screen_size();
+    void freez_game();
     
 private:
     GraphicsView *view;
@@ -138,6 +139,7 @@ private:
     PushButton *shop_button;
     Setting *rules;
     PushButton *open_rules_button;
+    GraphicsPixmapItem *freez_img;
     bool pause = false;
 
     int price_to_add = 25;

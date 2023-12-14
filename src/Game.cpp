@@ -39,6 +39,7 @@ Game::~Game(){
     delete shop_menu_setting;
     delete background_color;
     delete menu;
+    delete freez_img;
     delete view;
 }
 
@@ -80,14 +81,20 @@ void Game::init_game(){
 
 void Game::build_shop(){
     Xy pos = {screen_size.x-shop_setting_size.x, screen_size.y-shop_setting_size.y};
+    std::string t[] = {"field", "house", "shop"};
 
-    shop_img_pos["field"] = {pos.x+200, pos.y+120};
-    shop_img_pos["house"] = {pos.x+400, pos.y+120};
-    shop_img_pos["shop"] = {pos.x+600, pos.y+120};
+    for(int i=0; i<3; i++){
+        shop_img_pos[t[i]] = {pos.x+(i+1)*200, pos.y+120};
+    }
+
     shop_menu_setting = new Setting(this, pos, shop_setting_size, nullptr);
-    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["field"], *get_img_size("field"), &Game::try_to_buy_field, "buy_field", get_img("field")));
-    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["house"], *get_img_size("house"), &Game::try_to_buy_house, "buy_house", get_img("house")));
-    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["shop"], *get_img_size("shop"), &Game::try_to_buy_shop, "buy_shop", get_img("shop")));
+    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["field"], *get_img_size("field"), &Game::try_to_buy_field, "field", get_img("field")));
+    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["house"], *get_img_size("house"), &Game::try_to_buy_house, "house", get_img("house")));
+    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["shop"], *get_img_size("shop"), &Game::try_to_buy_shop, "shop", get_img("shop")));
+
+    for(int i =0; i<3; i++){
+        shop_menu_setting->get_button(t[i])->set_freezable();
+    }
 
     shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+230, pos.y+120+FIELD_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "field"));
     shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+430, pos.y+120+HOUSE_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "house"));
@@ -350,10 +357,24 @@ void Game::setup_scene(){
     rules->add_info_zone(new InfoZone(this, {static_cast<int>(screen_size.x*0.2), static_cast<int>(screen_size.y*0.3)}, {0, 0}, rules_txt, QColor(255, 255, 255), WITHOUT, "rules"));
     open_rules_button = new PushButton(this, {screen_size.x - 200, 80}, *get_img_size("rules_button"), &Game::open_rules, "open_rules", get_img("rules_button"));
     open_rules_button->add();
+    freez_img = new GraphicsPixmapItem(get_img("freez"), view->get_scene(), {30, screen_size.y-30});
     // bg_img = new QGraphicsPixmapItem(*images_map["bg"]);
     // bg_img->setTransformOriginPoint(images_map["bg"]->rect().center());
     // bg_img->setScale(qreal(view->get_scene()->width()) / qreal(images_map["bg"]->width()), 
     //                          qreal(view->get_scene()->height()) / qreal(images_map["bg"]->height()));
+}
+
+
+void Game::freez_game(){
+    if(!menu->get_activity() && !rules->get_is_open()){
+        if(!freez_img->is_open()){
+            freez_img->add_img();
+            pause = true;
+        }else{
+            freez_img->remove_img();
+            pause = false;
+        }
+    }
 }
 
 GraphicsView *Game::get_view(){
@@ -521,7 +542,7 @@ void Game::correct_pos(Xy *tab_pos, Xy *size){
 
 
 void Game::close_current_setting(){
-    if(pause){
+    if(rules->get_is_open()){
         close_rules();
     }else{
         current_open_setting.setting->close();
@@ -544,7 +565,7 @@ void Game::erase_button(PushButton *button){
 
 bool Game::its_a_button_click(Xy *pos){
     for(unsigned int i=0; i<button_vec.size(); i++){
-        if(button_vec[i]->is_it(pos) && (!pause || button_vec[i]->get_name() == "closing")){
+        if(button_vec[i]->is_it(pos) && (!pause || !button_vec[i]->get_freezable())){
             button_vec[i]->is_clicked();
             return true;
         }
@@ -696,7 +717,9 @@ void Game::open_rules(){
 
 void Game::close_rules(){
     rules->close();
-    pause = false;
+    if(!freez_img->is_open()){
+        pause = false;
+    }
 }
 
 

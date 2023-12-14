@@ -49,3 +49,10 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent *event){
 Xy GraphicsView::convert(QPointF coord_clic){
     return {static_cast<int>(coord_clic.rx()), static_cast<int>(coord_clic.ry())};
 }
+
+void GraphicsView::keyPressEvent(QKeyEvent* event){
+    int key = event->key();
+    if(key == Qt::Key_F){
+        game->freez_game();
+    }
+}

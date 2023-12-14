@@ -6,7 +6,7 @@
 #include <QColor>
 #include <QMouseEvent>
 #include <QPointF>
-
+#include <QKeyEvent>
 #include "../struct.h"
 class Game;
 
@@ -23,6 +23,7 @@ public:
     void mousePressEvent(QMouseEvent* event) override; 
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override; 
     Xy convert(QPointF coord_clic);   
     
 private:
