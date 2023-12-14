@@ -23,8 +23,11 @@ Le but du jeu est donc d'avoir le plus d'habitant possible.
 
 -Rendre le jeu balance
 -Trouver un background
--Faire un bouton pour lire les regles, in game et depuis le menu (si le bouton est pressé in game alors le jeu se met en pause)
--avoir un petit bouton en haut à gauche dans les settings des buildings pour avoir accés aux stats avancées
--Mettre le place le principe de surpopulation
 -Regler la hitbox des buildings
-
+-Régler le problème d'inclusion des fonctions communes
+-Rajouter une templete pour les infozone afin de pouvoir avoir la value que l'on veut.
+-Designner le menu_info.
+-Remplacer tout les getteurs et les setters par des templetes.
+-Mettre en place un bouton freez afin de bloquer l'avancée des stats, le mode freez empeche tout achat et amelioration.
+-Mettre une fonction pour regler la taille du text d'une info_zone et regler la taille dans les stats avancées
+-Remplacer le citizen ratio par une barre d'avancement
