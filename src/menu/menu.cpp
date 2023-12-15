@@ -5,9 +5,10 @@ Menu::Menu(Game *game){
     this->game = game;
     Xy *screen_size = game->get_screen_size();
     start_game_button = new PushButton(game, {static_cast<int>(screen_size->x*0.4), static_cast<int>(screen_size->y*0.5)}, *game->get_img_size("start"), &Game::start_signal, "start_game", game->get_img("start"));
-    menu_info = new InfoZone(game, {static_cast<int>(screen_size->x*0.3), static_cast<int>(screen_size->y*0.2)}, {0, 0}, "Wanna play a game ?", QColor(255, 255, 255), WITHOUT, "menu_info"); 
+    menu_info = new InfoZone(game, {static_cast<int>(screen_size->x*0.39), static_cast<int>(screen_size->y*0.35)}, {0, 0}, "Wanna play a game ?", QColor(255, 255, 255), WITHOUT, "menu_info"); 
     start_game_button->add();
     menu_info->add();
+    menu_info->set_txt_size(30);
     wait();
 }
 

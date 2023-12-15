@@ -13,7 +13,9 @@ public:
     void set_value(Xy coord, float value);
     void set_base_text(Xy coord, QString new_txt);
     float get_value(Xy coord);
+    void set_text_size(Xy coord, int x);
     std::string get_name();
+    void decal_txt(Xy coord, Xy decal);
 
     void add();
     void remove();

@@ -1,7 +1,5 @@
 #include "common_functions.h"
 
-
-
 template <typename K, typename V>
 void free_map(std::map<K, V> *map){
     std::vector<K> s;

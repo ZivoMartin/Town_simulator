@@ -4,8 +4,8 @@
 #include <iostream>
 #include <QGraphicsTextItem>
 #include <QColor>
+#include <QFont>
 #include "graphic_bg.h"
-#include "../common_functions/common_functions.h"
 
 class Game;
 
@@ -29,7 +29,8 @@ public:
     void set_base_text_of_a_son(QString new_txt, std::string name);
     void set_value_of_a_son(float x, std::string name);
     void set_color(QColor color);
-
+    void set_txt_size(int s);
+    
 private:
     Xy text_position;
     Xy bg_position;

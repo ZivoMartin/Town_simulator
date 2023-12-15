@@ -40,9 +40,9 @@ void Building::init_reverse_for_efficient_building(){
     Xy set_pos = setting->get_reverse()->get_pos();
     setting->get_reverse()->add_tab_info(new TabInfo(game, {5, 6}, {set_pos.x, set_pos.y+(game->get_size_setting_building()->y-30*6)}, {80, 30}, "advanced_stat"));
     TabInfo *t = setting->get_reverse()->get_tab_info("advanced_stat");
-    t->set_base_text({0, 3}, "Nombre maximum de travailleur");
-    t->set_base_text({0, 4}, "Ratio d'un travailleur");
-    t->set_base_text({0, 5}, "Ratio total maximum");
+    t->set_base_text({0, 3}, "Nombre max\nde travailleur");
+    t->set_base_text({0, 4}, "Ratio d'un \ntravailleur");
+    t->set_base_text({0, 5}, "Ratio total \nmaximum");
     t->set_color({1, 4}, Qt::green);
     t->set_color({1, 5}, Qt::green);
     for(int i=0; i<lvl_max; i++){
@@ -55,7 +55,7 @@ void Building::init_reverse_for_efficient_building(){
 void Building::init_reverse_for_house(){
     Xy set_pos = setting->get_reverse()->get_pos();
     setting->get_reverse()->add_tab_info(new TabInfo(game, {5, 4}, {set_pos.x, set_pos.y+(game->get_size_setting_building()->y-30*6)}, {80, 30}, "advanced_stat"));
-    setting->get_reverse()->get_tab_info("advanced_stat")->set_base_text({0, 3}, "Nombre maximum d'habitant'");
+    setting->get_reverse()->get_tab_info("advanced_stat")->set_base_text({0, 3}, "Nombre max\n d'habitant'");
     nb_line = 4;
 }
 
@@ -134,15 +134,19 @@ void Building::init_common_value(){
     t->set_color({1, 1}, Qt::green);
     t->set_color({1, 2}, Qt::green);
     t->set_color({1, 3}, Qt::green);
-    t->set_base_text({0, 1}, "Coût d'amelioration");
-    t->set_base_text({0, 2}, "Gain de vente");
+    t->set_base_text({0, 1}, "Coût \nd'amelioration");
+    t->set_base_text({0, 2}, "Gain \nde vente");
     for(int i=0; i<lvl_max; i++){
         if (i != lvl_max-1) {
             t->set_value({i+1, 1}, price_to_up[i]);
         }else{
-            t->set_base_text({i+1, 1}, "-");
+            t->set_base_text({i+1, 1}, "    -");
         }
         t->set_value({i+1, 2}, value_for_sold[i]);
         t->set_value({i+1, 3}, max_worker[i]);
+    }
+    for(int i=0; i<nb_line; i++){
+        t->set_text_size({0, i}, 12);
+        t->decal_txt({0, i}, {-10, -5});
     }
 }

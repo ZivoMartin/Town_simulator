@@ -31,6 +31,12 @@ float InfoZone::get_value(){
     return value;
 }
 
+void InfoZone::set_txt_size(int s){
+    QFont f;
+    f.setPixelSize(s);
+    this->setFont(f);
+}
+
 void InfoZone::set_base_text(QString new_base_text){
     this->base_text = new_base_text;
     QString new_display = base_text;

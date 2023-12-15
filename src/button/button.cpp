@@ -32,6 +32,7 @@ bool PushButton::is_it(Xy *coord){
 }
 
 void PushButton::is_clicked(){
+    std::cout << name << std::endl;
     (game->*(click))();
 }
 

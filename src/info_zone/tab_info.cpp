@@ -28,6 +28,14 @@ void TabInfo::set_base_text(Xy coord, QString new_txt){
     tab_info[coord.x][coord.y]->set_base_text(new_txt);
 }
 
+void TabInfo::set_text_size(Xy coord, int x){
+    tab_info[coord.x][coord.y]->set_txt_size(x);   
+}
+
+void TabInfo::decal_txt(Xy coord, Xy decal){
+    tab_info[coord.x][coord.y]->decal_txt(decal);
+}
+
 std::string TabInfo::get_name(){
     return this->name;
 }

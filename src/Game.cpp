@@ -105,7 +105,6 @@ void Game::build_shop(){
 
     Xy *s_shop_button = get_img_size("shop_icon");
     this->shop_button = new PushButton(this, {screen_size.x-s_shop_button->x, screen_size.y-s_shop_button->y}, *s_shop_button, &Game::open_shop, "open_shop", get_img("shop_icon"));
-    add_button(shop_button);
 }
 
 void Game::play(){
@@ -147,7 +146,7 @@ void Game::build_info_bubble(){
     top_info["food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 100, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "food_ratio");
     top_info["nb_citizen"]->add_son(new InfoZone(this, {58, 38}, {0, 0}, "Max: ", QColor(255, 255, 255), WITHOUT, "max_citizen"));
     top_info["nb_citizen"]->set_value_of_a_son(max_citizen, "max_citizen");
-    citizen_bar = new LoadingBar(this, {30+7*info_bubble_dims.x+30 + 130, 20}, {200, 40}, &Game::citizen_bar_complete);
+    citizen_bar = new LoadingBar(this, {30+7*info_bubble_dims.x+30 + 130, 20}, {200, 40}, &Game::citizen_bar_complete, "New citizen");
     citizen_bar->set_ratio(BASE_CITIZEN/10);
 }
 
@@ -171,13 +170,12 @@ void Game::open_shop(){
     if(current_open_setting.setting != nullptr){
         close_current_setting();
     }
+    shop_button->remove();
     set_current_setting(shop_menu_setting, nullptr);
 }
 
 void Game::screen_clicked(Xy coord_click){
-    if(its_a_button_click(&coord_click)){
-
-    }else if(current_open_setting.setting == nullptr){
+    if(!its_a_button_click(&coord_click) && current_open_setting.setting == nullptr){
         build_tab_case *clicked_case = get_map_tab_case(coord_to_tab(&coord_click));
         if(clicked_case == nullptr){
 
@@ -554,9 +552,11 @@ void Game::close_current_setting(){
     if(rules->get_is_open()){
         close_rules();
     }else{
+        if(shop_menu_setting->get_is_open()) shop_button->add();
         current_open_setting.setting->close();
         current_open_setting = {nullptr, nullptr};
     }
+    
 }
 
 void Game::add_button(PushButton *new_button){
@@ -730,8 +730,6 @@ void Game::close_rules(){
         pause = false;
     }
 }
-
-
 template <typename K, typename V>
 void free_map(std::map<K, V> *map){
     std::vector<K> s;
@@ -751,3 +749,4 @@ void free_vec(std::vector<T> *vec){
         vec->erase(vec->begin());
     }
 }
+

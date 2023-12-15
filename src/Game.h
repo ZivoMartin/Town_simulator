@@ -19,6 +19,7 @@
 #include "buildings/house.h"
 #include "info_zone/info_zone.h"
 #include "menu/menu.h"
+#include "src/common_functions/common_functions.h"
 #include "loading_bar/loading_bar.h"
 
 #define CASE_SIZE 15
