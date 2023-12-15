@@ -1,7 +1,7 @@
 #include  "loading_bar.h"
 #include "../Game.h"
 
-LoadingBar::LoadingBar(Game *game, Xy pos, Xy size, void (Game::*f)()) : QGraphicsRectItem(pos.x, pos.y, 2, size.y){
+LoadingBar::LoadingBar(Game *game, Xy pos, Xy size, void (Game::*f)()) : QGraphicsRectItem(pos.x, pos.y, size.x, size.y){
     this->game = game;
     this->pos = pos;
     this->size = size;
@@ -21,16 +21,22 @@ LoadingBar::~LoadingBar(){
 }
 
 void LoadingBar::load(){
-    QTimer::singleShot(20, game, [=](){
+    QTimer::singleShot(50, game, [=](){
         state += ratio;
         bar->setRect(pos.x, pos.y, state, size.y);
-        if(state >= size.y){
+        if(state >= size.x){
             (game->*(achievement))();
             state = 0;
-        }else{
+        }else if(!stop){
             load();
+        }else{
+            stop = false;
         }
     });
+}
+
+void LoadingBar::stop_load(){
+    stop = true;
 }
 
 void LoadingBar::set_ratio(int percent_value){

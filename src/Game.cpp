@@ -40,6 +40,7 @@ Game::~Game(){
     delete background_color;
     delete menu;
     delete freez_img;
+    delete citizen_bar;
     delete view;
 }
 
@@ -54,6 +55,8 @@ void Game::reset(){
     for(auto el: top_info){
         top_info[el.first]->remove();
     }
+    citizen_bar->stop_load();
+    citizen_bar->remove();
     shop_button->remove();
 }
 
@@ -140,11 +143,12 @@ void Game::build_info_bubble(){
     top_info["nb_citizen"] = new InfoZone(this, {30+2*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizens: ", color_map["top_info"], CIRCLE, "nb_food");
     top_info["nb_worker"] = new InfoZone(this, {30+3*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Workers: ", color_map["top_info"], CIRCLE, "nb_worker");
     top_info["nb_non_worker"] = new InfoZone(this, {30+4*info_bubble_dims.x+30, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Unemployeds: ", color_map["top_info"], CIRCLE, "nb_non_worker");
-    top_info["gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 170, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE, "gold_ratio");
-    top_info["food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 170, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "food_ratio");
-    top_info["citizen_ratio"] = new InfoZone(this, {30+7*info_bubble_dims.x+30 + 170, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Citizen ratio: ", color_map["top_ratio"], CIRCLE, "nb_citizen_ratio");
+    top_info["gold_ratio"] = new InfoZone(this, {30+5*info_bubble_dims.x+30 + 100, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Gold ratio: ", color_map["top_ratio"], CIRCLE, "gold_ratio");
+    top_info["food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 100, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "food_ratio");
     top_info["nb_citizen"]->add_son(new InfoZone(this, {58, 38}, {0, 0}, "Max: ", QColor(255, 255, 255), WITHOUT, "max_citizen"));
     top_info["nb_citizen"]->set_value_of_a_son(max_citizen, "max_citizen");
+    citizen_bar = new LoadingBar(this, {30+7*info_bubble_dims.x+30 + 130, 20}, {200, 40}, &Game::citizen_bar_complete);
+    citizen_bar->set_ratio(BASE_CITIZEN/10);
 }
 
 void Game::init_info_bubble(){
@@ -155,11 +159,11 @@ void Game::init_info_bubble(){
     top_info["nb_non_worker"]->set_value(BASE_CITIZEN);
     top_info["gold_ratio"]->set_value(-1);
     top_info["food_ratio"]->set_value(-BASE_CITIZEN/10);
-    top_info["citizen_ratio"]->set_value(BASE_CITIZEN/factor_citizen_ratio);    
-
+    citizen_bar->add();
     for(auto elt: top_info){
         top_info[elt.first]->add();
     }
+    citizen_bar->load();
 }
 
 
@@ -207,28 +211,16 @@ void Game::update_info(){
             top_info["nb_citizen"]->set_text_color(QColor(0, 0, 0));
         }
     }
-    current_stat["citizen"] += top_info["citizen_ratio"]->get_value();
-    int new_citizen_nb = current_stat["citizen"] + top_info["citizen_ratio"]->get_value();
-    int display_citizen_nb = top_info["nb_citizen"]->get_value();
-    if(new_citizen_nb > display_citizen_nb){
-        if(new_citizen_nb > max_citizen){
-            top_info["nb_citizen"]->set_text_color(Qt::red);
-            if(new_citizen_nb >= surpopulation){
-                end_game("You lost because of surpopulation ! Wanna restart ?");
-            }
-        }
-        top_info["citizen_ratio"]->set_value(new_citizen_nb/factor_citizen_ratio);
-        top_info["nb_citizen"]->set_value(new_citizen_nb);
-        top_info["nb_non_worker"]->set_value(top_info["nb_non_worker"]->get_value() + (new_citizen_nb-display_citizen_nb));
-        nb_citizen = new_citizen_nb;
-        nb_unemployed += (new_citizen_nb-display_citizen_nb);
-        update_food_ratio();
-    }
+   
     if(nb_citizen <= 0){
         end_game("Lost by famine, wanna restart ?");
-    } else if(nb_citizen > surpopulation){
-        end_game("Lost by surpopulation, wanna restart ?");
     }
+}
+
+void Game::citizen_bar_complete(){
+    add_citizen();
+    citizen_bar->set_ratio(nb_citizen/10);
+    citizen_bar->load();
 }
 
 void Game::click_release(Xy stop_pos){
@@ -369,9 +361,11 @@ void Game::freez_game(){
     if(!menu->get_activity() && !rules->get_is_open()){
         if(!freez_img->is_open()){
             freez_img->add_img();
+            citizen_bar->stop_load();
             pause = true;
         }else{
             freez_img->remove_img();
+            citizen_bar->load();
             pause = false;
         }
     }
@@ -517,6 +511,21 @@ Xy *Game::get_size_setting_building(){
 Xy Game::coord_to_tab(Xy *entry){
     return {entry->x/CASE_SIZE, entry->y/CASE_SIZE};
 }
+
+void Game::add_citizen(){
+    nb_citizen += 1;
+    if(nb_citizen > max_citizen){
+        top_info["nb_citizen"]->set_text_color(Qt::red);
+        if(nb_citizen >= surpopulation){
+            end_game("You lost because of surpopulation ! Wanna restart ?");
+        }
+    }
+    top_info["nb_citizen"]->set_value(nb_citizen);
+    top_info["nb_non_worker"]->set_value(top_info["nb_non_worker"]->get_value() + 1);
+    nb_unemployed += 1;
+    update_food_ratio();
+}
+
 
 Xy Game::tab_to_coord(Xy *entry){
     return {entry->x*CASE_SIZE, entry->y*CASE_SIZE};

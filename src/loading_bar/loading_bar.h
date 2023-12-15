@@ -18,6 +18,7 @@ public:
     
     void load();
     void set_ratio(int percent_value);
+    void stop_load();
 
     void add();
     void remove();
@@ -32,6 +33,7 @@ private:
     int state = 0;
     bool is_open = false;
     QBrush *load_bar_brush;
+    bool stop = false;
 
     void (Game::*achievement)();
 

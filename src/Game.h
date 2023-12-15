@@ -19,6 +19,7 @@
 #include "buildings/house.h"
 #include "info_zone/info_zone.h"
 #include "menu/menu.h"
+#include "loading_bar/loading_bar.h"
 
 #define CASE_SIZE 15
 #define FIELD_WIDTH 105
@@ -104,6 +105,8 @@ public:
     void close_rules();
     Xy *get_screen_size();
     void freez_game();
+    void add_citizen();
+    void citizen_bar_complete();
     
 private:
     GraphicsView *view;
@@ -140,6 +143,7 @@ private:
     Setting *rules;
     PushButton *open_rules_button;
     GraphicsPixmapItem *freez_img;
+    LoadingBar *citizen_bar;
     bool pause = false;
 
     int price_to_add = 25;
