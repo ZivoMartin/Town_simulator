@@ -86,24 +86,27 @@ void Game::init_game(){
 
 void Game::build_shop(){
     Xy pos = {screen_size.x-shop_setting_size.x, screen_size.y-shop_setting_size.y};
-    std::string t[] = {"field", "house", "shop"};
+    std::string t[] = {"field", "house", "shop", "farm"};
 
-    for(int i=0; i<3; i++){
-        shop_img_pos[t[i]] = {pos.x+(i+1)*200, pos.y+120};
+    shop_img_pos[t[0]] = {pos.x+100, pos.y+75};
+    for(int i=1; i<4; i++){
+        shop_img_pos[t[i]] = {pos.x+(i)*200+100, pos.y+75};
     }
 
     shop_menu_setting = new Setting(this, pos, shop_setting_size, nullptr);
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["field"], *get_img_size("field"), &Game::try_to_buy_field, "field", get_img("field")));
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["house"], *get_img_size("house"), &Game::try_to_buy_house, "house", get_img("house")));
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["shop"], *get_img_size("shop"), &Game::try_to_buy_shop, "shop", get_img("shop")));
+    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["farm"], *get_img_size("farm"), &Game::try_to_buy_farm, "farm", get_img("farm")));
 
-    for(int i =0; i<3; i++){
+    for(int i =0; i<4; i++){
         shop_menu_setting->get_button(t[i])->set_freezable();
     }
 
-    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+230, pos.y+120+FIELD_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "field"));
-    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+430, pos.y+120+HOUSE_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "house"));
-    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+630, pos.y+120+SHOP_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "shop"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+130, pos.y+75+FIELD_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "field"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+330, pos.y+75+HOUSE_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "house"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+530, pos.y+75+SHOP_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "shop"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+730, pos.y+75+FARM_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "farm"));
 
     Xy *s_shop_button = get_img_size("shop_icon");
     this->shop_button = new PushButton(this, {screen_size.x-s_shop_button->x, screen_size.y-s_shop_button->y}, *s_shop_button, &Game::open_shop, "open_shop", get_img("shop_icon"));
@@ -148,6 +151,8 @@ void Game::build_info_bubble(){
     top_info["food_ratio"] = new InfoZone(this, {30+6*info_bubble_dims.x+30 + 100, 0}, {info_bubble_dims.x, info_bubble_dims.y}, "Food ratio: ", color_map["top_ratio"], CIRCLE, "food_ratio");
     top_info["nb_citizen"]->add_son(new InfoZone(this, {58, 38}, {0, 0}, "Max: ", QColor(255, 255, 255), WITHOUT, "max_citizen"));
     top_info["nb_citizen"]->set_value_of_a_son(max_citizen, "max_citizen");
+    top_info["nb_food"]->add_son(new InfoZone(this, {58, 38}, {0, 0}, "Max: ", QColor(255, 255, 255), WITHOUT, "max_food"));
+    top_info["nb_food"]->set_value_of_a_son(0, "max_food");
     citizen_bar = new LoadingBar(this, {30+7*info_bubble_dims.x+30 + 130, 20}, {200, 40}, &Game::citizen_bar_complete, "New citizen");
     citizen_bar->set_ratio(BASE_CITIZEN/10);
 }
@@ -200,10 +205,10 @@ QColor Game::get_color(std::string color){
 void Game::update_info(){
     increase_gold(top_info["gold_ratio"]->get_value());
     float new_food = current_stat["food"]+top_info["food_ratio"]->get_value();
-    if(new_food > 0){
+    if(new_food > 0 && new_food < max_food){
         current_stat["food"] = new_food;
         top_info["nb_food"]->set_value(static_cast<int>(new_food));    
-    }else{
+    }else if(new_food <= 0){
         current_stat["citizen"] -= 1;
         top_info["nb_citizen"]->set_value(static_cast<int>(current_stat["citizen"]));
         nb_citizen -= 1;
@@ -260,7 +265,7 @@ void Game::click_release(Xy stop_pos){
         std::string str = "shop"; 
         if(try_to_buy == FIELD) str = "field";
         if(try_to_buy == HOUSE) str = "house";
-
+        if(try_to_buy == FARM) str = "farm";
         if(create_new_building(str, stop_pos)){
             increase_gold(-(building_price[str] - price_to_add));
         }
@@ -310,6 +315,14 @@ G Game::apply_method_0(build_tab_case *building, G (Building::*f)()){
     exit(EXIT_FAILURE);
 }
 
+int Game::get_max_food(){
+    return max_food;
+}
+
+void Game::set_max_food(int x){
+    max_food = x;
+    top_info["nb_food"]->set_value_of_a_son(x, "max_food");
+}
 
 int Game::get_iter(){
     return iter;
@@ -409,7 +422,7 @@ bool Game::create_new_building(std::string type, Xy pos){
         }
         update_gold_ratio();
         building_price[type] += price_to_add;
-//        shop_menu_setting->get_info_zone(type)->set_value(building_price[type]);
+       shop_menu_setting->get_info_zone(type)->set_value(building_price[type]);
         return true;
     }
     return false;
@@ -640,6 +653,32 @@ void Game::update_gold_ratio(){
     top_info["gold_ratio"]->set_value(new_gold_ratio);
 }
 
+void Game::update_max_citizen(){
+    int new_max = 0;
+    for(unsigned int i=0; i<house_vec.size(); i++){
+        new_max += house_vec[i]->get_efficiency();
+    }
+    max_citizen = new_max;
+    top_info["nb_citizen"]->set_value_of_a_son(max_citizen, "max_citizen");
+}
+
+void Game::update_max_food(){
+    int new_max = 0;
+    for(unsigned int i=0; i<farm_vec.size(); i++){
+        new_max += farm_vec[i]->get_efficiency();
+    }
+    max_food = new_max;
+    top_info["nb_food"]->set_value_of_a_son(max_food, "max_food");
+}
+
+
+void Game::update_stat(){
+    update_gold_ratio();
+    update_food_ratio();
+    update_max_citizen();
+    update_max_food();
+}
+
 void Game::try_to_buy_shop(){
     if(current_stat["gold"] >= building_price["shop"]){
         try_to_buy = SHOP;
@@ -731,8 +770,7 @@ void Game::lvl_up(){
     if(current_stat["gold"] >= price){
         increase_gold(-price);
         apply_method_0(current_open_setting.building, &Building::lvl_up);
-        update_gold_ratio();
-        update_food_ratio();
+        update_stat();
     }
 }
 

@@ -113,6 +113,11 @@ public:
     void freez_game();
     void add_citizen();
     void citizen_bar_complete();
+    int get_max_food();
+    void set_max_food(int x);
+    void update_max_citizen();
+    void update_max_food();
+    void update_stat();
     
 private:
     GraphicsView *view;
@@ -140,7 +145,7 @@ private:
     Xy size_settings_building = {400, 230};
     current_setting current_open_setting = {nullptr, nullptr};
     Xy screen_size;
-    Xy shop_setting_size = {800, 300};
+    Xy shop_setting_size = {900, 250};
     Setting *shop_menu_setting;
     QGraphicsPixmapItem *bg_img;
     type_building try_to_buy = EMPTY;
@@ -160,6 +165,7 @@ private:
     int max_citizen;
     int surpopulation;
     int gold_limit;
+    int max_food = 0;
 
     float factor_citizen_ratio = 800;
 

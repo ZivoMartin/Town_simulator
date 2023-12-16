@@ -10,8 +10,6 @@ class Farm: public Container{
 public:
     Farm(Game *game, Xy coord);
     ~Farm();
-    bool add_worker() override;
-    bool pull_worker() override;
     void init_stat() override;
 };
 

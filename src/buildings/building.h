@@ -19,7 +19,7 @@ public:
     void drag(Xy new_pos);
     Xy get_size();
     void set_origin_pos(Xy new_pos);
-    float get_efficiency();
+    virtual float get_efficiency();
     virtual void clicked();
     virtual bool add_worker() = 0;
     virtual bool pull_worker() = 0;

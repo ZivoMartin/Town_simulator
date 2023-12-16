@@ -11,26 +11,10 @@ House::House(Game *game, Xy coord) : Container(game->get_img("house"), game, coo
     game->set_max_citizen(game->get_max_citizen()+max_worker[0]);
     setting->get_reverse()->get_info_zone("header")->set_base_text("House");
     init_common_value();
+    setting->get_reverse()->get_tab_info("advanced_stat")->set_base_text({0, 3}, "Nombre max\n d'habitant'");
 }
 
 House::~House(){}
-
-
-bool House::add_worker(){
-    if(nb_worker < max_worker[lvl]){
-        nb_worker += 1;
-        return true;
-    }
-    return false;
-}
-
-bool House::pull_worker(){
-    if(nb_worker>0){
-        nb_worker -= 1;
-        return true;
-    }
-    return false;
-}
 
 void House::init_stat(){
     type = "house";

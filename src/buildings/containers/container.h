@@ -10,6 +10,9 @@ public:
     ~Container();
     void init_reverse() override;
     void init_personnal_value() override;
+    bool add_worker() override;
+    bool pull_worker() override;
+    float get_efficiency() override;
 
 private:
 
