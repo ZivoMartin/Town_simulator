@@ -36,29 +36,6 @@ void Building::init_setting(Xy coord){
     setting->get_reverse()->add_info_zone(new InfoZone(game, {static_cast<int>(coord.x+set_s->x*0.35), coord.y+10}, {120, 30}, "", game->get_color("reverse_info_color"), RECT, "header"));
 }
 
-void Building::init_reverse_for_efficient_building(){
-    Xy set_pos = setting->get_reverse()->get_pos();
-    setting->get_reverse()->add_tab_info(new TabInfo(game, {5, 6}, {set_pos.x, set_pos.y+(game->get_size_setting_building()->y-30*6)}, {80, 30}, "advanced_stat"));
-    TabInfo *t = setting->get_reverse()->get_tab_info("advanced_stat");
-    t->set_base_text({0, 3}, "Nombre max\nde travailleur");
-    t->set_base_text({0, 4}, "Ratio d'un \ntravailleur");
-    t->set_base_text({0, 5}, "Ratio total \nmaximum");
-    t->set_color({1, 4}, Qt::green);
-    t->set_color({1, 5}, Qt::green);
-    for(int i=0; i<lvl_max; i++){
-        t->set_value({i+1, 4}, value_per_worker[i]);
-        t->set_value({i+1, 5}, value_per_worker[i]*max_worker[i]);
-    }
-    nb_line = 6;
-}
-
-void Building::init_reverse_for_house(){
-    Xy set_pos = setting->get_reverse()->get_pos();
-    setting->get_reverse()->add_tab_info(new TabInfo(game, {5, 4}, {set_pos.x, set_pos.y+(game->get_size_setting_building()->y-30*6)}, {80, 30}, "advanced_stat"));
-    setting->get_reverse()->get_tab_info("advanced_stat")->set_base_text({0, 3}, "Nombre max\n d'habitant'");
-    nb_line = 4;
-}
-
 int Building::get_nb_worker(){
     return nb_worker;
 }
@@ -121,6 +98,7 @@ void Building::sold(){
 }
 
 void Building::init_common_value(){
+    init_reverse();
     setting->get_info_zone("nb_max_worker")->set_value(static_cast<float>(max_worker[0]));
     setting->get_info_zone("sold_price")->set_value(value_for_sold[0]);
     setting->get_info_zone("upgrade_price")->set_value(price_to_up[0]);
@@ -149,4 +127,5 @@ void Building::init_common_value(){
         t->set_text_size({0, i}, 12);
         t->decal_txt({0, i}, {-10, -5});
     }
+    setting->add_img(new GraphicsPixmapItem(game->get_img(type), game->get_view()->get_scene(), {origin_pos.x+306, origin_pos.y+100}));
 }

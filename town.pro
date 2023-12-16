@@ -14,37 +14,43 @@ INCLUDEPATH += .
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
-HEADERS += src/Game.h \
+HEADERS += src/common_functions/common_functions.h \
+           src/Game.h \
            src/struct.h \
            src/buildings/building.h \
-           src/buildings/field.h \
-           src/buildings/house.h \
-           src/buildings/shop.h \
+           src/buildings/generators/field.h \
+           src/buildings/containers/house.h \
+           src/buildings/generators/shop.h \
            src/button/button.h \
            src/image/GraphicsPixmapItem.h \
            src/info_zone/info_zone.h \
            src/settings_building/settings.h \
            src/view/GraphicsView.h \
            src/info_zone/graphic_bg.h \
-           src/common_functions/common_functions.h \
            src/menu/menu.h \
            src/info_zone/tab_info.h \
-           src/loading_bar/loading_bar.h
+           src/loading_bar/loading_bar.h \
+           src/buildings/generators/Generator.h \
+           src/buildings/containers/container.h \
+           src/buildings/containers/farm.h
 SOURCES += main.cpp \
+           src/common_functions/common_functions.cpp \
            src/Game.cpp \
            src/buildings/building.cpp \
-           src/buildings/field.cpp \
-           src/buildings/house.cpp \
-           src/buildings/shop.cpp \
+           src/buildings/generators/field.cpp \
+           src/buildings/containers/house.cpp \
+           src/buildings/generators/shop.cpp \
            src/button/button.cpp \
            src/image/GraphicsPixmapItem.cpp \
            src/info_zone/info_zone.cpp \
            src/settings_building/settings.cpp \
            src/view/GraphicsView.cpp \
            src/info_zone/graphic_bg.cpp \
-           src/common_functions/common_functions.cpp \
            src/menu/menu.cpp \
            src/info_zone/tab_info.cpp \
-           src/loading_bar/loading_bar.cpp
+           src/loading_bar/loading_bar.cpp \
+           src/buildings/generators/Generator.cpp \
+           src/buildings/containers/container.cpp \
+           src/buildings/containers/farm.cpp
 
 QT += widgets

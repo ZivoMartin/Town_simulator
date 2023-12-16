@@ -72,10 +72,11 @@ void TabInfo::remove(){
 }
 
 void TabInfo::set_pos(Xy pos){
-    this->pos = pos;
     for(int i = 0; i < dim.x; i++){
         for(int j=0; j<dim.y; j++){
-            tab_info[i][j]->set_pos(pos);
+            Xy w_pos = tab_info[i][j]->get_pos();
+            tab_info[i][j]->set_pos({pos.x+(w_pos.x - this->pos.x), pos.y+(w_pos.y - this->pos.y)});
         }
     }
+    this->pos = pos;
 }

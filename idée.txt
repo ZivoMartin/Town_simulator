@@ -21,12 +21,9 @@ augmentent.
 Le but du jeu est donc d'avoir le plus d'habitant possible.
 
 
--Rendre le jeu balance
 -Trouver un background
 -Regler la hitbox des buildings
 -Régler le problème d'inclusion des fonctions communes
--Rajouter une templete pour les infozone afin de pouvoir avoir la value que l'on veut.
--Designner le menu_info.
--Remplacer tout les getteurs et les setters par des templetes.
--Mettre une fonction pour regler la taille du text d'une info_zone et regler la taille dans les stats avancées
--Remplacer le citizen ratio par une barre d'avancement
+-Rajouter le fils du nb_food
+-implementer la limite de food
+-Rajouter l'achat du nb_food

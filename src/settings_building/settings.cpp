@@ -112,6 +112,10 @@ void Setting::set_pos(Xy pos){
             Xy *w_pos = static_img_vec[i]->get_pos();
             static_img_vec[i]->set_pos_img({pos.x+(w_pos->x - this->pos.x), pos.y+(w_pos->y - this->pos.y)});
         }
+        if(reverse_button != nullptr){
+            Xy w_pos = reverse_button->get_pos();
+            reverse_button->set_pos({pos.x+(w_pos.x - this->pos.x), pos.y+(w_pos.y - this->pos.y)});
+        }
         setPos(pos.x, pos.y);
         this->pos = pos;
         reverse_setting->set_pos(pos);

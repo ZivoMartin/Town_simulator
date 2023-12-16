@@ -6,9 +6,9 @@
 #include <QBrush>
 #include <QApplication>
 
-#include "../buildings/field.h"
-#include "../buildings/house.h"
-#include "../buildings/shop.h"
+#include "../buildings/generators/field.h"
+#include "../buildings/containers/house.h"
+#include "../buildings/generators/shop.h"
 #include "../struct.h"
 #include "../button/button.h"
 #include "../info_zone/tab_info.h"

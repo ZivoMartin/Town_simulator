@@ -1,11 +1,11 @@
 #ifndef safe_house
 #define safe_house
 
-#include "building.h"
+#include "container.h"
 
 class Game;
 
-class House: public Building{
+class House: public Container{
 
 public:
     House(Game *game, Xy coord);

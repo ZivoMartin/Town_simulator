@@ -24,13 +24,13 @@ public:
     virtual bool add_worker() = 0;
     virtual bool pull_worker() = 0;
     virtual void init_stat() = 0;
+    virtual void init_reverse() = 0;
     int get_price_to_up();
     void sold();
     void lvl_up();
     void init_common_value();
+    virtual void init_personnal_value() = 0;
     void init_setting(Xy coord);
-    void init_reverse_for_efficient_building();
-    void init_reverse_for_house();
 
 protected:
     Game *game;
@@ -41,6 +41,7 @@ protected:
     build_tab_case *setting_union;
     int lvl_max = 4;
     int nb_line;
+    std::string type;
     
     std::vector<int> max_worker;
     std::vector<float> value_per_worker;

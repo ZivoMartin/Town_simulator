@@ -7,6 +7,7 @@
 class Field;
 class House;
 class Shop;
+class Farm;
 class InfoZone;
 class Setting;
 
@@ -19,12 +20,14 @@ union union_building{
     Shop *shop;
     House *house;
     Field *field;
+    Farm *farm;
 };
 
 enum type_building{
     SHOP,
     HOUSE,
     FIELD,
+    FARM,
     EMPTY
 };
 

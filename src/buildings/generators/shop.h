@@ -1,10 +1,10 @@
 #ifndef safe_shop
 #define safe_shop
-#include "building.h"
+#include "Generator.h"
 
 class Game;
 
-class Shop: public Building{
+class Shop: public Generator{
 
 public:
     Shop(Game *game, Xy coord);

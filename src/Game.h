@@ -14,9 +14,10 @@
 #include <QScreen>
 #include "image/GraphicsPixmapItem.h"
 #include "view/GraphicsView.h"
-#include "buildings/field.h"
-#include "buildings/shop.h"
-#include "buildings/house.h"
+#include "buildings/generators/field.h"
+#include "buildings/generators/shop.h"
+#include "buildings/containers/house.h"
+#include "buildings/containers/farm.h"
 #include "info_zone/info_zone.h"
 #include "menu/menu.h"
 #include "src/common_functions/common_functions.h"
@@ -29,6 +30,8 @@
 #define SHOP_HEIGHT 105
 #define HOUSE_WIDTH 105
 #define HOUSE_HEIGHT 105
+#define FARM_HEIGHT 105
+#define FARM_WIDTH 105
 #define FRAME_SPEED 20
 #define BASE_CITIZEN 10
 #define BASE_FOOD 100
@@ -62,6 +65,7 @@ public:
     void set_case_field(Xy pos, Field *field);
     void set_case_shop(Xy pos, Shop *shop);
     void set_case_house(Xy pos, House *house);
+    void set_case_farm(Xy pos, Farm *farm);
     void set_case_empty(Xy pos);
     build_tab_case *get_map_tab_case(Xy pos);
     int convert_one_dim(Xy *pos);
@@ -88,6 +92,7 @@ public:
     void try_to_buy_shop();
     void try_to_buy_house();
     void try_to_buy_field();
+    void try_to_buy_farm();
     void set_max_citizen(int x);
     int get_max_citizen();
     void sold_building();
@@ -125,6 +130,7 @@ private:
     std::vector<Field*> field_vec;
     std::vector<House*> house_vec;
     std::vector<Shop*> shop_vec;
+    std::vector<Farm*> farm_vec;
     std::vector<PushButton*> button_vec;
 
     drag dragging;

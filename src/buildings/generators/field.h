@@ -1,11 +1,11 @@
 #ifndef safe_field
 #define safe_field
 
-#include "building.h"
+#include "Generator.h"
 
 class Game;
 
-class Field: public Building{
+class Field: public Generator{
 
 public:
     Field(Game *game, Xy coord);
@@ -13,7 +13,7 @@ public:
     bool add_worker() override;
     bool pull_worker() override;
     void init_stat() override;
-    
+
 };
 
 #endif

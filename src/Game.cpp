@@ -5,6 +5,7 @@ Game::Game(GraphicsView *view): QMainWindow(){
     view->show();
     view->set_game(this);
     this->view = view;
+    dragging.dragging = false;
     load_images();
     load_colors();
     setup_scene();
@@ -16,7 +17,6 @@ Game::Game(GraphicsView *view): QMainWindow(){
 
 void Game::start(){
     iter = 0;
-    dragging.dragging = false;
     init_info_bubble();
     shop_button->add();
     init_game();
@@ -48,6 +48,7 @@ void Game::clean_building(){
     free_vec<Field*>(&field_vec);
     free_vec<Shop*>(&shop_vec);
     free_vec<House*>(&house_vec);
+    free_vec<Farm*>(&farm_vec);
 }
 
 void Game::reset(){
@@ -61,7 +62,6 @@ void Game::reset(){
 }
 
 void Game::init_game(){
-    dragging.dragging = false;
     nb_citizen = BASE_CITIZEN;
     nb_worker = 0;
     nb_unemployed = BASE_CITIZEN;
@@ -75,11 +75,13 @@ void Game::init_game(){
     building_price["shop"] = 50;
     building_price["house"] = 25;
     building_price["field"] = 50;
+    building_price["farm"] = 50;
 
     create_new_building("field", {34*CASE_SIZE, 30*CASE_SIZE});
     create_new_building("shop", {38*CASE_SIZE, 22*CASE_SIZE});
     create_new_building("house", {28*CASE_SIZE, 19*CASE_SIZE});
     create_new_building("house", {35*CASE_SIZE, 15*CASE_SIZE});
+    create_new_building("farm", {45*CASE_SIZE, 45*CASE_SIZE});
 }
 
 void Game::build_shop(){
@@ -283,7 +285,9 @@ G Game::apply_method_1(build_tab_case *building, G (Building::*f)(T), T arg){
         case SHOP:
             return (building->building.shop->*f)(arg);
         case HOUSE:
-            return (building->building.house->*f)(arg);     
+            return (building->building.house->*f)(arg);    
+        case FARM:
+            return (building->building.farm->*f)(arg);
         case EMPTY:
             exit(EXIT_FAILURE); 
     }
@@ -298,6 +302,8 @@ G Game::apply_method_0(build_tab_case *building, G (Building::*f)()){
             return (building->building.shop->*f)();
         case HOUSE:
             return (building->building.house->*f)();     
+        case FARM:
+            return (building->building.farm->*f)();  
         case EMPTY:
             exit(EXIT_FAILURE);   
     }
@@ -312,7 +318,7 @@ bool Game::is_dragging(){
     return dragging.dragging;
 }
 void Game::load_images(){
-    std::vector<std::string> t = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up", "start", "info", "rules_button", "freez"};
+    std::vector<std::string> t = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up", "start", "info", "rules_button", "freez", "farm"};
     dim_img_map["field"] = {FIELD_WIDTH, FIELD_HEIGHT};
     dim_img_map["house"] = {HOUSE_WIDTH, HOUSE_HEIGHT};
     dim_img_map["shop"] = {SHOP_WIDTH, SHOP_HEIGHT};
@@ -326,6 +332,7 @@ void Game::load_images(){
     dim_img_map["info"] = {30, 30};
     dim_img_map["rules_button"] = {200, 60};
     dim_img_map["freez"] = {50, 50};
+    dim_img_map["farm"] = {FARM_WIDTH, FARM_HEIGHT};
 
     for(unsigned int i=0; i<t.size(); i++){ 
         images_map[t[i]] = new QPixmap();
@@ -395,10 +402,14 @@ bool Game::create_new_building(std::string type, Xy pos){
             Field *new_building = new Field(this, pos);
             field_vec.push_back(new_building);
             this->new_building(new_building, &Game::set_case_field);
+        }else if(type == "farm"){
+            Farm *new_building = new Farm(this, pos);
+            farm_vec.push_back(new_building);
+            this->new_building(new_building, &Game::set_case_farm);
         }
         update_gold_ratio();
         building_price[type] += price_to_add;
-        shop_menu_setting->get_info_zone(type)->set_value(building_price[type]);
+//        shop_menu_setting->get_info_zone(type)->set_value(building_price[type]);
         return true;
     }
     return false;
@@ -464,6 +475,8 @@ bool Game::its_dragged_item_case(Xy pos){
             return dragging.item.type == FIELD && c->building.field == dragging.item.building.field;
         }else if(c->type == SHOP){
             return dragging.item.type == SHOP && c->building.shop == dragging.item.building.shop;
+        }else if(c->type == FARM){
+            return dragging.item.type == FARM && c->building.farm == dragging.item.building.farm;
         }else{
             return dragging.item.type == HOUSE && c->building.house == dragging.item.building.house;
         }
@@ -487,6 +500,12 @@ void Game::set_case_house(Xy pos, House *house){
     int converted_pos = convert_one_dim(&pos);
     map_tab[converted_pos].type = HOUSE;
     map_tab[converted_pos].building.house = house;
+}
+
+void Game::set_case_farm(Xy pos, Farm *farm){
+    int converted_pos = convert_one_dim(&pos);
+    map_tab[converted_pos].type = FARM;
+    map_tab[converted_pos].building.farm = farm;
 }
 
 void Game::set_case_empty(Xy pos){
@@ -645,6 +664,15 @@ void Game::try_to_buy_field(){
     }
 }
 
+void Game::try_to_buy_farm(){
+    if(current_stat["gold"] >= building_price["farm"]){
+        try_to_buy = FARM;
+        try_to_buy_img = new GraphicsPixmapItem(get_img("farm"), view->get_scene(), shop_img_pos["farm"]);
+        try_to_buy_img->add_img();
+    }
+}
+
+
 void Game::set_max_citizen(int x){
     max_citizen = x;
     surpopulation = max_citizen * 1.2;
@@ -674,8 +702,10 @@ void Game::sold_building(){
         remove_elt(&field_vec, current_open_setting.building->building.field);
     }else if(current_open_setting.building->type == SHOP){
         remove_elt(&shop_vec, current_open_setting.building->building.shop);
-    }else{
+    }else if(current_open_setting.building->type == HOUSE){
         remove_elt(&house_vec, current_open_setting.building->building.house);
+    }else{
+        remove_elt(&farm_vec, current_open_setting.building->building.farm);
     }
     apply_method_0(current_open_setting.building, &Building::sold);
     current_open_setting = {nullptr, nullptr};
