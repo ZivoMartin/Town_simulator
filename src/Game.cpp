@@ -36,6 +36,7 @@ Game::~Game(){
         delete try_to_buy_img;
     }
 
+    delete bg_img;
     delete shop_menu_setting;
     delete background_color;
     delete menu;
@@ -86,9 +87,9 @@ void Game::init_game(){
 
 void Game::build_shop(){
     Xy pos = {screen_size.x-shop_setting_size.x, screen_size.y-shop_setting_size.y};
-    std::string t[] = {"field", "house", "shop", "farm"};
+    std::string t[] = {"farm", "field", "house", "shop"};
 
-    shop_img_pos[t[0]] = {pos.x+100, pos.y+75};
+    shop_img_pos["farm"] = {pos.x+100, pos.y+75};
     for(int i=1; i<4; i++){
         shop_img_pos[t[i]] = {pos.x+(i)*200+100, pos.y+75};
     }
@@ -97,7 +98,7 @@ void Game::build_shop(){
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["field"], *get_img_size("field"), &Game::try_to_buy_field, "field", get_img("field")));
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["house"], *get_img_size("house"), &Game::try_to_buy_house, "house", get_img("house")));
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["shop"], *get_img_size("shop"), &Game::try_to_buy_shop, "shop", get_img("shop")));
-    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["farm"], *get_img_size("farm"), &Game::try_to_buy_farm, "farm", get_img("farm")));
+    shop_menu_setting->add_button(new PushButton(this, shop_img_pos["farm"], *get_img_size("farm_icon"), &Game::try_to_buy_farm, "farm", get_img("farm_icon")));
 
     for(int i =0; i<4; i++){
         shop_menu_setting->get_button(t[i])->set_freezable();
@@ -331,7 +332,7 @@ bool Game::is_dragging(){
     return dragging.dragging;
 }
 void Game::load_images(){
-    std::vector<std::string> t = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up", "start", "info", "rules_button", "freez", "farm"};
+    std::vector<std::string> t = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up", "start", "info", "rules_button", "freez", "farm", "farm_icon"};
     dim_img_map["field"] = {FIELD_WIDTH, FIELD_HEIGHT};
     dim_img_map["house"] = {HOUSE_WIDTH, HOUSE_HEIGHT};
     dim_img_map["shop"] = {SHOP_WIDTH, SHOP_HEIGHT};
@@ -346,6 +347,7 @@ void Game::load_images(){
     dim_img_map["rules_button"] = {200, 60};
     dim_img_map["freez"] = {50, 50};
     dim_img_map["farm"] = {FARM_WIDTH, FARM_HEIGHT};
+    dim_img_map["farm_icon"] = {BUILDING_ICON_WIDTH, BUILDING_ICON_HEIGHT};
 
     for(unsigned int i=0; i<t.size(); i++){ 
         images_map[t[i]] = new QPixmap();
@@ -353,7 +355,7 @@ void Game::load_images(){
         *images_map[t[i]] = images_map[t[i]]->scaled(dim_img_map[t[i]].x, dim_img_map[t[i]].y);
     }
     images_map["bg"] = new QPixmap();
-    images_map["bg"]->load(QString::fromStdString("../images/bg.png"));
+    images_map["bg"]->load("../images/bg.png");
 }
 
 void Game::setup_scene(){
@@ -368,10 +370,9 @@ void Game::setup_scene(){
     open_rules_button = new PushButton(this, {screen_size.x - 200, 80}, *get_img_size("rules_button"), &Game::open_rules, "open_rules", get_img("rules_button"));
     open_rules_button->add();
     freez_img = new GraphicsPixmapItem(get_img("freez"), view->get_scene(), {30, screen_size.y-30});
-    // bg_img = new QGraphicsPixmapItem(*images_map["bg"]);
-    // bg_img->setTransformOriginPoint(images_map["bg"]->rect().center());
-    // bg_img->setScale(qreal(view->get_scene()->width()) / qreal(images_map["bg"]->width()), 
-    //                          qreal(view->get_scene()->height()) / qreal(images_map["bg"]->height()));
+    *images_map["bg"] = images_map["bg"]->scaled(screen_size.x+100, screen_size.y+200);
+    bg_img = new GraphicsPixmapItem(images_map["bg"], view->get_scene(), {static_cast<int>(screen_size.x/2), static_cast<int>(screen_size.y*0.8)});
+    bg_img->add_img();
 }
 
 

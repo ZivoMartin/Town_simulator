@@ -17,7 +17,7 @@ Farm::Farm(Game *game, Xy coord) : Container(game->get_img("farm"), game, coord)
 Farm::~Farm(){}
 
 void Farm::init_stat(){
-    type = "farm";
+    type = "farm_icon";
     max_worker = {100, 150, 200, 300};
     price_to_up = {100, 150, 200};
     value_for_sold = {30, 60, 100, 120};

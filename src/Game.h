@@ -30,12 +30,14 @@
 #define SHOP_HEIGHT 105
 #define HOUSE_WIDTH 105
 #define HOUSE_HEIGHT 105
-#define FARM_HEIGHT 105
-#define FARM_WIDTH 105
+#define FARM_HEIGHT 130
+#define FARM_WIDTH 130
 #define FRAME_SPEED 20
 #define BASE_CITIZEN 10
 #define BASE_FOOD 100
 #define BASE_GOLD 100
+#define BUILDING_ICON_WIDTH 105
+#define BUILDING_ICON_HEIGHT 105
 
 
 class Game : public QMainWindow{
@@ -147,7 +149,7 @@ private:
     Xy screen_size;
     Xy shop_setting_size = {900, 250};
     Setting *shop_menu_setting;
-    QGraphicsPixmapItem *bg_img;
+    GraphicsPixmapItem *bg_img;
     type_building try_to_buy = EMPTY;
     GraphicsPixmapItem *try_to_buy_img = nullptr;
     Menu *menu;
@@ -169,7 +171,7 @@ private:
 
     float factor_citizen_ratio = 800;
 
-    QString rules_txt = "Principe du jeu:\nC'est une simulation de gestion de ville, le joueur à trois choses à gérer, l'argent qui lui permet de construire, la nourriture qui lui permet de \ngarder ses habitants en vie, et le nombre d'habitant. Le joueur a donc trois indices, nourriture gagnée par seconde, nombre d'habitants en plus par seconde,\net argent gagnée par seconde.\n\nIl éxiste 3 catégories de batiments:\n    -Le champs: Il permet d'augmenter la nourriture gagnée par seconde, s'il n'y a plus de nourriture un habitant meurt par seconde.\n  -La superette: Elle permet de générer de l'argent. Si l'argent dépasse une certaine valeur négative (-100), la partie est finie.\n  -Les maison: Elles permettent de loger les habitants. En fonction du nombre maximum d'habitant pouvant peupler la ville, une valeur de surpopulation\n  superieur à celle d'habitant maximum est donnée, si cette valeur est depassée, la partie est perdue.\n  Il est donc autorisé de depasser la limite mais le temps sera alors compté avant la défaite, c'est une sorte d'avertissement.\n\nDans chaque batiment il peut il y a voir un nombre maximum de personne qui y travaille, chaque habitant en plus dans le batiment augmente les ressources\nque ce batiment génère par seconde. Chaque batiment peut etre amelioré pour augmenter sa capacitée à accueilir des habitants ainsi que le rendement d'un habitant \ndans le batiment. Pour les maisons ca augmente simplement le nombre d'habitant logable à l'interieur. Pus il y a d'habitant, plus les besoins en nourriture \naugmentent, plus il y à de bâtiments plus le ratio en gold par seconde baisse.\n\nLe but du jeu est donc d'avoir le plus d'habitant possible.";
+    QString rules_txt = "Principe du jeu:\nC'est une simulation de gestion de ville, le joueur à trois choses à gérer, l'argent qui lui permet de construire, la nourriture qui lui permet de \ngarder ses habitants en vie, et le nombre d'habitant. Le joueur a donc trois indices, nourriture gagnée par seconde, nombre d'habitants en plus par seconde,\net argent gagnée par seconde.\n\nIl éxiste 3 catégories de batiments:\n    -Le champs: Il permet d'augmenter la nourriture gagnée par seconde, s'il n'y a plus de nourriture un habitant meurt par seconde.\n  -La superette: Elle permet de générer de l'argent. Si l'argent dépasse une certaine valeur négative (-100), la partie est finie.\n  -Les maison: Elles permettent de loger les habitants. En fonction du nombre maximum d'habitant pouvant peupler la ville, une valeur de surpopulation\n  superieur à celle d'habitant maximum est donnée, si cette valeur est depassée, la partie est perdue.\n  Il est donc autorisé de depasser la limite mais le temps sera alors compté avant la défaite, c'est une sorte d'avertissement.\n    -La ferme permet d'augmenter la quantitée de food stockable !\n\nDans chaque batiment il peut il y a voir un nombre maximum de personne qui y travaille, chaque habitant en plus dans le batiment augmente les ressources\nque ce batiment génère par seconde. Chaque batiment peut etre amelioré pour augmenter sa capacitée à accueilir des habitants ainsi que le rendement d'un habitant \ndans le batiment. Pour les maisons ca augmente simplement le nombre d'habitant logable à l'interieur. Pus il y a d'habitant, plus les besoins en nourriture \naugmentent, plus il y à de bâtiments plus le ratio en gold par seconde baisse.\n\nLe but du jeu est donc d'avoir le plus d'habitant possible.";
 };
 
 #endif

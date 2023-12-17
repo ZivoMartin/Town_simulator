@@ -25,7 +25,7 @@ LoadingBar::~LoadingBar(){
 
 void LoadingBar::load(){
     QTimer::singleShot(20, game, [=](){
-        state += ratio/10;
+        state += ratio/5;
         bar->setRect(pos.x, pos.y, state, size.y);
         if(state >= size.x){
             (game->*(achievement))();
