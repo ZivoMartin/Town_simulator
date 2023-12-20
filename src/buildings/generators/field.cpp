@@ -8,7 +8,7 @@ Field::Field(Game *game, Xy coord) : Generator(game->get_img("field"), game, coo
     setting_union = new build_tab_case;
     setting_union->type = FIELD;
     setting_union->building.field = this;
-    setting->get_info_zone("lvl")->set_base_text("Field level ");
+    setting->get_info_zone("lvl")->set_base_text("Field niveau ");
     setting->get_reverse()->get_info_zone("header")->set_base_text("Field");
     init_common_value();
 }

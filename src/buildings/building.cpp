@@ -31,8 +31,6 @@ void Building::init_setting(Xy coord){
     setting->get_info_zone("lvl")->set_value(1);
     setting->get_info_zone("upgrade_price")->decal_txt({-10, 0});
     setting->get_info_zone("sold_price")->decal_txt({-10, 0});
-    setting->get_button("been")->set_freezable();
-    setting->get_button("lvl_up")->set_freezable();
     setting->get_reverse()->add_info_zone(new InfoZone(game, {static_cast<int>(coord.x+set_s->x*0.35), coord.y+10}, {120, 30}, "", game->get_color("reverse_info_color"), RECT, "header"));
 }
 

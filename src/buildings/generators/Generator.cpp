@@ -10,8 +10,6 @@ Generator::Generator(QPixmap *image, Game *game, Xy coord) : Building(image, gam
     setting->add_info_zone(new InfoZone(game, {coord.x+20, coord.y+133}, {150, 30}, "Nb worker: ", game->get_color("increase_worker"), RECT, "nb_worker"));
     setting->add_info_zone(new InfoZone(game, {coord.x+20, coord.y+175}, {150, 30}, "Nb max worker: ", game->get_color("decrease_worker"), RECT, "nb_max_worker"));
     setting->get_info_zone("nb_worker")->set_value(0.0);
-    setting->get_button("more_worker")->set_freezable();
-    setting->get_button("less_worker")->set_freezable();
 }
 
 Generator::~Generator(){}

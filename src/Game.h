@@ -12,6 +12,7 @@
 #include <QColor>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QApplication>
 #include "image/GraphicsPixmapItem.h"
 #include "view/GraphicsView.h"
 #include "buildings/generators/field.h"
@@ -32,7 +33,6 @@
 #define HOUSE_HEIGHT 105
 #define FARM_HEIGHT 130
 #define FARM_WIDTH 130
-#define FRAME_SPEED 20
 #define BASE_CITIZEN 10
 #define BASE_FOOD 100
 #define BASE_GOLD 100
@@ -43,7 +43,7 @@
 class Game : public QMainWindow{
 
 public: 
-    Game(GraphicsView *view);
+    Game(QApplication *app, GraphicsView *view);
     ~Game();
     void play();
     void init_game();
@@ -120,9 +120,19 @@ public:
     void update_max_citizen();
     void update_max_food();
     void update_stat();
+    void open_param();
+    void close_param();
+    void build_param();
+    void quit_app();
+    void kill_a_citizen();
+    void speed_down();
+    void speed_up();
+    void return_to_menu();
+    int get_speed_frame();
     
 private:
     GraphicsView *view;
+    QApplication *app;
     unsigned int iter;
     
     std::map<std::string, QPixmap*> images_map;
@@ -139,7 +149,7 @@ private:
     std::vector<Shop*> shop_vec;
     std::vector<Farm*> farm_vec;
     std::vector<PushButton*> button_vec;
-
+    
     drag dragging;
     QColor *background_color;
     Xy info_bubble_dims = {180, 70};
@@ -158,8 +168,11 @@ private:
     PushButton *open_rules_button;
     GraphicsPixmapItem *freez_img;
     LoadingBar *citizen_bar;
-    bool pause = false;
+    Setting *param;
 
+
+    bool pause = false;
+    int frame_speed = 20;
     int price_to_add = 25;
     int nb_citizen;
     int nb_worker;

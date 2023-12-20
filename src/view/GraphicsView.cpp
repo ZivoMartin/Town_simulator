@@ -54,5 +54,7 @@ void GraphicsView::keyPressEvent(QKeyEvent* event){
     int key = event->key();
     if(key == Qt::Key_F){
         game->freez_game();
+    }else if(key == Qt::Key_Escape){
+        game->open_param();
     }
 }

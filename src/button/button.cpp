@@ -9,25 +9,34 @@ PushButton::PushButton(Game *game, Xy pos, Xy size, void (Game::*f)(), std::stri
     this->name = name;
     this->click = f;
     this->pos = pos;
+    this->pos.y -= (size.x/200)*75;
 }
 
-PushButton::~PushButton(){   
+PushButton::~PushButton(){
+    if(info_zone != nullptr){
+        delete info_zone;
+    }   
 }
 
 void PushButton::remove(){
     remove_img();
     game->erase_button(this);
+    is_display = false;
+    if(info_zone != nullptr){
+        info_zone->remove();
+    }
 }
 
 void PushButton::add(){
     add_img();
     game->add_button(this);
+    is_display = true;
+    if(info_zone != nullptr){
+        info_zone->add();
+    }
 }
 
 bool PushButton::is_it(Xy *coord){
-    if(size.x > 106 || size.y > 106){
-        return coord->x < pos.x+size.x && coord->x+70 > pos.x && coord->y+70 < pos.y+size.y && coord->y+70 > pos.y;    
-    }
     return coord->x < pos.x+size.x && coord->x > pos.x && coord->y < pos.y+size.y && coord->y > pos.y;
 }
 
@@ -54,4 +63,10 @@ void PushButton::set_freezable(){
 
 bool PushButton::get_freezable(){
     return freezable;
+}
+
+void PushButton::set_info_zone(QString txt){
+    this->info_zone = new InfoZone(game, {pos.x, pos.y}, size, txt, QColor(150, 150, 150), RECT, "txt");
+    info_zone->decal_txt({size.x/10, 10});
+    info_zone->set_txt_size(size.y/2);
 }

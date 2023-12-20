@@ -24,7 +24,7 @@ LoadingBar::~LoadingBar(){
 }
 
 void LoadingBar::load(){
-    QTimer::singleShot(20, game, [=](){
+    QTimer::singleShot(game->get_speed_frame(), game, [=](){
         state += ratio/5;
         bar->setRect(pos.x, pos.y, state, size.y);
         if(state >= size.x){
@@ -36,6 +36,11 @@ void LoadingBar::load(){
             stop = false;
         }
     });
+}
+
+void LoadingBar::reset_load(){
+    state = 0;
+    bar->setRect(pos.x, pos.y, 0, size.y);
 }
 
 void LoadingBar::stop_load(){

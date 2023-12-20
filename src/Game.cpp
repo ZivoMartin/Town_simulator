@@ -1,14 +1,16 @@
 #include "Game.h"
 
-Game::Game(GraphicsView *view): QMainWindow(){
+Game::Game(QApplication *app, GraphicsView *view): QMainWindow(){
     view->showFullScreen();
     view->show();
     view->set_game(this);
     this->view = view;
+    this->app = app;
     dragging.dragging = false;
     load_images();
     load_colors();
     setup_scene();
+    build_param();
     build_info_bubble();
     build_shop();
     menu = new Menu(this);
@@ -27,6 +29,10 @@ void Game::start_signal(){
     menu->start_game();
 }
 
+void Game::quit_app(){
+    app->quit();
+}
+
 Game::~Game(){
     clean_building();
     free_map(&images_map);
@@ -42,6 +48,7 @@ Game::~Game(){
     delete menu;
     delete freez_img;
     delete citizen_bar;
+    delete param;
     delete view;
 }
 
@@ -58,8 +65,10 @@ void Game::reset(){
         top_info[el.first]->remove();
     }
     citizen_bar->stop_load();
+    citizen_bar->reset_load();
     citizen_bar->remove();
     shop_button->remove();
+    frame_speed = 20;
 }
 
 void Game::init_game(){
@@ -82,7 +91,9 @@ void Game::init_game(){
     create_new_building("shop", {38*CASE_SIZE, 22*CASE_SIZE});
     create_new_building("house", {28*CASE_SIZE, 19*CASE_SIZE});
     create_new_building("house", {35*CASE_SIZE, 15*CASE_SIZE});
-    create_new_building("farm", {45*CASE_SIZE, 45*CASE_SIZE});
+    create_new_building("farm", {50*CASE_SIZE, 15*CASE_SIZE});
+
+    citizen_bar->load();
 }
 
 void Game::build_shop(){
@@ -100,21 +111,17 @@ void Game::build_shop(){
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["shop"], *get_img_size("shop"), &Game::try_to_buy_shop, "shop", get_img("shop")));
     shop_menu_setting->add_button(new PushButton(this, shop_img_pos["farm"], *get_img_size("farm_icon"), &Game::try_to_buy_farm, "farm", get_img("farm_icon")));
 
-    for(int i =0; i<4; i++){
-        shop_menu_setting->get_button(t[i])->set_freezable();
-    }
-
-    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+130, pos.y+75+FIELD_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "field"));
-    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+330, pos.y+75+HOUSE_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "house"));
-    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+530, pos.y+75+SHOP_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "shop"));
-    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+730, pos.y+75+FARM_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "farm"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+330, pos.y+75+FIELD_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "field"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+530, pos.y+75+HOUSE_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "house"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+730, pos.y+75+SHOP_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "shop"));
+    shop_menu_setting->add_info_zone(new InfoZone(this, {pos.x+130, pos.y+75+BUILDING_ICON_HEIGHT+5}, {50, 30}, "$", get_color("price"), RECT, "farm"));
 
     Xy *s_shop_button = get_img_size("shop_icon");
     this->shop_button = new PushButton(this, {screen_size.x-s_shop_button->x, screen_size.y-s_shop_button->y}, *s_shop_button, &Game::open_shop, "open_shop", get_img("shop_icon"));
 }
 
 void Game::play(){
-    QTimer::singleShot(FRAME_SPEED, this, [=](){
+    QTimer::singleShot(frame_speed, this, [=](){
         iter += 1;
         if(iter%10 == 0 && !pause){
             update_info();    
@@ -170,7 +177,6 @@ void Game::init_info_bubble(){
     for(auto elt: top_info){
         top_info[elt.first]->add();
     }
-    citizen_bar->load();
 }
 
 
@@ -183,11 +189,13 @@ void Game::open_shop(){
 }
 
 void Game::screen_clicked(Xy coord_click){
-    if(!its_a_button_click(&coord_click) && current_open_setting.setting == nullptr){
+    if(!its_a_button_click(&coord_click)){
         build_tab_case *clicked_case = get_map_tab_case(coord_to_tab(&coord_click));
         if(clicked_case == nullptr){
-
-        }else{
+            if(current_open_setting.setting != nullptr && !current_open_setting.setting->is_it(&coord_click)){
+                close_current_setting();
+            }
+        }else if(current_open_setting.setting == nullptr){
             dragging = {true, *clicked_case};
         }       
     }
@@ -210,16 +218,35 @@ void Game::update_info(){
         current_stat["food"] = new_food;
         top_info["nb_food"]->set_value(static_cast<int>(new_food));    
     }else if(new_food <= 0){
-        current_stat["citizen"] -= 1;
-        top_info["nb_citizen"]->set_value(static_cast<int>(current_stat["citizen"]));
-        nb_citizen -= 1;
-        if(nb_citizen <= max_citizen){
-            top_info["nb_citizen"]->set_text_color(QColor(0, 0, 0));
-        }
+        kill_a_citizen();       
     }
-   
+}
+
+void Game::kill_a_citizen(){
+    current_stat["citizen"] -= 1;
+    top_info["nb_citizen"]->set_value(static_cast<int>(current_stat["citizen"]));
+    nb_citizen -= 1;
+    if(nb_citizen <= max_citizen){
+        top_info["nb_citizen"]->set_text_color(QColor(0, 0, 0));
+    }
     if(nb_citizen <= 0){
         end_game("Lost by famine, wanna restart ?");
+    }else if(nb_unemployed >0){
+        nb_unemployed -= 1;
+        top_info["nb_non_worker"]->set_value(nb_unemployed);
+    }else{
+        for(unsigned int i=0; i<field_vec.size(); i++){
+            if(field_vec[i]->get_nb_worker() != 0){
+                field_vec[i]->pull_worker();
+                return;
+            }
+        }
+        for(unsigned int i=0; i<shop_vec.size(); i++){
+            if(shop_vec[i]->get_nb_worker() != 0){
+                shop_vec[i]->pull_worker();
+                break;
+            }
+        }
     }
 }
 
@@ -332,7 +359,7 @@ bool Game::is_dragging(){
     return dragging.dragging;
 }
 void Game::load_images(){
-    std::vector<std::string> t = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up", "start", "info", "rules_button", "freez", "farm", "farm_icon"};
+    std::vector<std::string> t = {"field", "house", "shop", "close_button", "less", "more", "shop_icon", "been", "lvl_up", "start", "info", "rules_button", "freez", "farm", "farm_icon", "settings", "quit", "restart", "empty"};
     dim_img_map["field"] = {FIELD_WIDTH, FIELD_HEIGHT};
     dim_img_map["house"] = {HOUSE_WIDTH, HOUSE_HEIGHT};
     dim_img_map["shop"] = {SHOP_WIDTH, SHOP_HEIGHT};
@@ -348,7 +375,10 @@ void Game::load_images(){
     dim_img_map["freez"] = {50, 50};
     dim_img_map["farm"] = {FARM_WIDTH, FARM_HEIGHT};
     dim_img_map["farm_icon"] = {BUILDING_ICON_WIDTH, BUILDING_ICON_HEIGHT};
-
+    dim_img_map["settings"] = {100, 100};
+    dim_img_map["quit"] = {200, 60};
+    dim_img_map["restart"] = {200, 60};
+    dim_img_map["empty"] = {400, 100};
     for(unsigned int i=0; i<t.size(); i++){ 
         images_map[t[i]] = new QPixmap();
         images_map[t[i]]->load(QString::fromStdString("../images/"+ t[i] + ".png"));
@@ -368,13 +398,64 @@ void Game::setup_scene(){
     rules = new Setting(this, {-15, -15}, {screen_size.x+30, screen_size.y+30}, nullptr);
     rules->add_info_zone(new InfoZone(this, {static_cast<int>(screen_size.x*0.2), static_cast<int>(screen_size.y*0.3)}, {0, 0}, rules_txt, QColor(255, 255, 255), WITHOUT, "rules"));
     open_rules_button = new PushButton(this, {screen_size.x - 200, 80}, *get_img_size("rules_button"), &Game::open_rules, "open_rules", get_img("rules_button"));
-    open_rules_button->add();
     freez_img = new GraphicsPixmapItem(get_img("freez"), view->get_scene(), {30, screen_size.y-30});
     *images_map["bg"] = images_map["bg"]->scaled(screen_size.x+100, screen_size.y+200);
     bg_img = new GraphicsPixmapItem(images_map["bg"], view->get_scene(), {static_cast<int>(screen_size.x/2), static_cast<int>(screen_size.y*0.8)});
     bg_img->add_img();
+    open_rules_button->add();
 }
 
+void Game::build_param(){
+    Xy param_pos = {static_cast<int>(screen_size.x*0.35), static_cast<int>(screen_size.y*0.2)};
+    param = new Setting(this, param_pos, {600, 500}, nullptr);
+    param->set_color(QColor(200, 200, 200));
+    param->add_button(new PushButton(this, {param_pos.x+20+100, param_pos.y+100+100}, *get_img_size("empty"), &Game::return_to_menu, "menu", get_img("empty")));
+    param->get_button("menu")->set_info_zone("Return to menu");
+    param->add_button(new PushButton(this, {param_pos.x+20+100, param_pos.y+100+200+10}, *get_img_size("empty"), &Game::speed_up, "up", get_img("empty")));
+    param->get_button("up")->set_info_zone("Up speed");
+    param->add_button(new PushButton(this, {param_pos.x+20+100, param_pos.y+100+300+20}, *get_img_size("empty"), &Game::speed_down, "down", get_img("empty")));
+    param->get_button("down")->set_info_zone("Down speed");
+    param->add_button(new PushButton(this, {param_pos.x+20+100, param_pos.y+100+400+30}, *get_img_size("empty"), &Game::quit_app, "quit", get_img("empty")));
+    param->get_button("quit")->set_info_zone("Quit Game");
+}
+
+void Game::return_to_menu(){
+    close_param();
+    end_game("Wanna play a game ?");
+}
+
+int Game::get_speed_frame(){
+    return frame_speed;
+}
+
+void Game::speed_down(){
+    frame_speed += 10;
+}
+
+void Game::speed_up(){
+    if(frame_speed > 10){
+        frame_speed -= 10;
+    }
+}
+
+void Game::open_param(){
+    if(param->get_is_open()){
+        close_param();
+    }else{
+        param->open();
+        citizen_bar->stop_load();
+        pause = true;
+    }
+    
+}
+
+void Game::close_param(){
+    param->close();
+    if(!freez_img->is_open()){
+        citizen_bar->load();
+        pause = false;
+    }
+}
 
 void Game::freez_game(){
     if(!menu->get_activity() && !rules->get_is_open()){
@@ -423,7 +504,7 @@ bool Game::create_new_building(std::string type, Xy pos){
         }
         update_gold_ratio();
         building_price[type] += price_to_add;
-       shop_menu_setting->get_info_zone(type)->set_value(building_price[type]);
+        shop_menu_setting->get_info_zone(type)->set_value(building_price[type]);
         return true;
     }
     return false;
@@ -584,6 +665,8 @@ void Game::correct_pos(Xy *tab_pos, Xy *size){
 void Game::close_current_setting(){
     if(rules->get_is_open()){
         close_rules();
+    }else if(param->get_is_open()){
+        close_param();
     }else{
         if(shop_menu_setting->get_is_open()) shop_button->add();
         current_open_setting.setting->close();
@@ -790,6 +873,7 @@ void Game::reverse_current_setting(){
 
 void Game::open_rules(){
     rules->open();
+    citizen_bar->stop_load();   
     pause = true;
 }
 
@@ -797,6 +881,7 @@ void Game::close_rules(){
     rules->close();
     if(!freez_img->is_open()){
         pause = false;
+        citizen_bar->load();
     }
 }
 template <typename K, typename V>

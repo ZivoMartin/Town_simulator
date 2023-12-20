@@ -25,6 +25,7 @@ public:
     Xy get_pos();
     void set_freezable();
     bool get_freezable();
+    void set_info_zone(QString txt);
 
 private:
     Game *game;
@@ -37,6 +38,8 @@ private:
     QGraphicsTextItem *text_item;
     std::string name;
     bool freezable = false;
+    bool is_display = false;
+    InfoZone *info_zone = nullptr;
 };
 
 #endif

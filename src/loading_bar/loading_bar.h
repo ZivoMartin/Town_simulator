@@ -20,6 +20,7 @@ public:
     void load();
     void set_ratio(int percent_value);
     void stop_load();
+    void reset_load();
 
     void add();
     void remove();

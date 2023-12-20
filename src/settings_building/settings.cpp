@@ -34,6 +34,11 @@ Setting::~Setting(){
     }
 }
 
+void Setting::set_color(QColor new_color){
+    brush->setColor(new_color);
+    this->setBrush(*brush);
+}
+
 void Setting::switch_have_to_delete_reverse(){
     have_to_delete_reverse = false;
 }
@@ -177,6 +182,10 @@ Setting *Setting::get_reverse(){
 
 bool Setting::get_is_open(){
     return is_open;
+}
+
+bool Setting::is_it(Xy *coord){
+    return coord->x < pos.x+size.x && coord->x > pos.x && coord->y < pos.y+size.y && coord->y > pos.y;
 }
 
 template <typename K, typename V>

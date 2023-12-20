@@ -37,6 +37,8 @@ public:
     void set_reverse_button();
     Setting *reverse();
     void switch_have_to_delete_reverse();
+    void set_color(QColor new_color);
+    bool is_it(Xy *coord);
 
 private:
     PushButton *close_button;
