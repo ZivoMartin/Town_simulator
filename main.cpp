@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     GraphicsView *view = new GraphicsView();
-    Game game(view);
+    Game game(&app, view);
     view->set_game(&game);
     view->showFullScreen();
     view->show();
